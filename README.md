@@ -8,8 +8,7 @@ to a C implementation for performance.
 
 # How does it work?
 
-The Dockerfile installs the official pl/java package available at the [PostgreSQL apt repo]
-(https://apt.postgresql.org/pub/repos/apt/pool/main/p/postgresql-pljava/). This includes the
+The Dockerfile installs the official pl/java package available at the [PostgreSQL apt repo](https://apt.postgresql.org/pub/repos/apt/pool/main/p/postgresql-pljava/). This includes the
 'pgxs' application used to load and unload jar files.
 
 The Dockerfile also installs [pgTAP](https://pgtap.org/) (for unit testing) and
