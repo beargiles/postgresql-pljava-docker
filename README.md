@@ -46,7 +46,7 @@ and follow the restrictions listed on the [pl/java wiki](https://github.com/tada
 The Dockerfile will then need to be modified to:
 
 * download and build the java code
-* add a `/docker-entrypoint-initdb.d` script calling 'pgxs' to install the jar(s)
+* add a `/docker-entrypoint-initdb.d` script using 'pgxs' to install the jar(s)
 
 At this point the custom jars will be available for use by any pl/java stored procedure.
 
@@ -55,6 +55,6 @@ At this point the custom jars will be available for use by any pl/java stored pr
 The official list of [prebuilt PL/Java distributions](https://github.com/tada/pljava/wiki/Prebuilt-packages)
 includes two additional docker images.
 
-# TO DO
+# Source code
 
-Need to add an initialization script that performs tests to verify the extension was properly installed.
+The source code is located at [github.com/beargiles/postgresql-pljava-docker](https://github.com/beargiles/postgresql-pljava-docker).

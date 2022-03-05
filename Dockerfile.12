@@ -1,8 +1,4 @@
-#
-# All Dockerfile are identical except for the version for the base image and
-# the Debian packages
-#
-FROM postgres:14.2
+FROM postgres:12.10
 
 EXPOSE 5432
 
@@ -10,7 +6,7 @@ EXPOSE 5432
 RUN apt-get update && apt-get upgrade
 
 # Install pljava, pgtap, and pgxnclient
-RUN apt-get install -y postgresql-14-pljava postgresql-14-pgtap pgxnclient
+RUN apt-get install -y postgresql-12-pljava postgresql-12-pgtap pgxnclient
 
 # Remove cached files, unnecessary packages, etc.
 RUN apt-get autoclean && apt-get autoremove
