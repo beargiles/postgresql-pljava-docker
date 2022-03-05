@@ -17,7 +17,7 @@ I wrote a series of articles on how to use PL/Java back in 2011.
 - [Introduction to PostgeSQL PL/java, part 5: Operations and Indexes](https://invariantproperties.com/?p=614)
 
 This extension creates a new JVM for each database connection. These docker images are configured
-(per [PL/JKava VM option recommendations](https://tada.github.io/pljava/install/vmoptions.html)) for
+(per [PL/Java VM option recommendations](https://tada.github.io/pljava/install/vmoptions.html)) for
 improved performance albeit at the cost of making it impossible to attach to a running instance with
 a debugger.
 
