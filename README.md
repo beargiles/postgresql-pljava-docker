@@ -145,3 +145,12 @@ includes two additional docker images.
 # Source code
 
 The source code is located at [github.com/beargiles/postgresql-pljava-docker](https://github.com/beargiles/postgresql-pljava-docker).
+
+# PL/Java prebuild distribution information:
+
+- {1.6.4,"14.2 (Debian 14.2-1.pgdg110+1)",11.0.14,Linux,amd64}
+- {1.6.4,"13.6 (Debian 13.6-1.pgdg110+1)",11.0.14,Linux,amd64}
+- {1.6.4,"12.10 (Debian 12.10-1.pgdg110+1)",11.0.14,Linux,amd64}
+- {1.5.6,"11.15 (Debian 11.15-1.pgdg90+1)",1.8.0_322,Linux,amd64}
+- {1.5.6,"10.20 (Debian 10.20-1.pgdg90+1)",1.8.0_322,Linux,amd64}
+
