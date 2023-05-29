@@ -102,15 +102,15 @@ $(foreach version,$(VERSIONS),$(eval $(call build-version,$(version))))
 ## RULES FOR TESTING ###
 
 test-prepare:
-ifeq ("$(wildcard $(OFFIMG_LOCAL_CLONE))","")
-	$(GIT) clone $(OFFIMG_REPO_URL) $(OFFIMG_LOCAL_CLONE)
-endif
+#ifeq ("$(wildcard $(OFFIMG_LOCAL_CLONE))","")
+#	$(GIT) clone $(OFFIMG_REPO_URL) $(OFFIMG_LOCAL_CLONE)
+#endif
 
 test: $(foreach version,$(VERSIONS),test-$(version))
 
 define test-version
-test-$1: test-prepare build-$1
-echo "version: $version"
+test-$1: test-prepare test-$1
+echo "TODO: implement tests for version: $version"
 endef
 $(foreach version,$(VERSIONS),$(eval $(call test-version,$(version))))
 
@@ -125,7 +125,6 @@ $(foreach version,$(VERSIONS),$(eval $(call test-version,$(version))))
 #endif
 #endif
 #endef
-
 
 
 ### RULES FOR TAGGING ###
