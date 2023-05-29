@@ -7,7 +7,7 @@ SET client_min_messages TO INFO;
 -- Install 'examples' jar
 --
 SET check_function_bodies TO off;
-SELECT sqlj.install_jar('file:///usr/share/postgresql/12/pljava/pljava-examples-1.6.4.jar', 'ex', true);
+SELECT sqlj.install_jar('file:///tmp/pljava-examples-1.6.jar', 'ex', true);
 SET check_function_bodies TO on;
 
 SELECT sqlj.set_classpath('javatest', 'saxon:saxon_jdom:ex');
@@ -15,7 +15,7 @@ SELECT sqlj.set_classpath('javatest', 'saxon:saxon_jdom:ex');
 --
 -- perform simple query
 --
-SELECT array_agg(java_getsystemproperty(p))
+SELECT array_agg(javatest.java_getsystemproperty(p))
   FROM (values('org.postgresql.pljava.version'),
               ('org.postgresql.version'),
               ('java.version'),

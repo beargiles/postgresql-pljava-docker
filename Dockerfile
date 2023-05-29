@@ -2,24 +2,29 @@
 # All Dockerfile are identical except for the version for the base image and
 # the Debian packages
 #
-FROM postgres:14.2
+ARG POSTGRES_VERSION
+FROM postgres:${POSTGRES_VERSION}
+
+ARG POSTGRES_MAJOR
 
 EXPOSE 5432
 
+VOLUME /var/log/postgresql/
+VOLUME /docker-entrypoint-initdb.d/
+
 # Update apt and current packages
-RUN apt-get update && apt-get upgrade
+RUN /usr/bin/apt-get update && apt-get upgrade
 
 # Install pljava, pgtap, and pgxnclient
-RUN apt-get install -y postgresql-14-pljava postgresql-14-pgtap pgxnclient \
-            libsaxon-java libsaxonb-java libpostgresql-jdbc-java
+RUN /usr/bin/apt-get install -y postgresql-${POSTGRES_MAJOR}-pljava \
+    postgresql-${POSTGRES_MAJOR}-pgtap pgxnclient \
+    libsaxon-java libsaxonb-java libpostgresql-jdbc-java
 
 # Remove cached files, unnecessary packages, etc.
-RUN apt-get autoclean && apt-get autoremove
+RUN /usr/bin/apt-get autoclean && apt-get autoremove
 
 # Create 'pljava' extension on launch
-COPY pljava-vars.sh   /docker-entrypoint-initdb.d/1.pljava-vars.sh
-COPY pljava-setup.sql /docker-entrypoint-initdb.d/2.pljava-setup.sql
-COPY pljava-saxon.sql /docker-entrypoint-initdb.d/3.pljava-saxon.sql
-COPY pljava-test.sql  /docker-entrypoint-initdb.d/4.pljava-test.sql
+COPY docker-entrypoint-initdb.d/ /docker-entrypoint-initdb.d/
+RUN /bin/cp /usr/share/postgresql/${POSTGRES_MAJOR}/pljava/pljava-examples-1.6.*.jar /tmp/pljava-examples-1.6.jar
 
-RUN chmod 0755 /docker-entrypoint-initdb.d/1.pljava-vars.sh
+RUN /bin/chmod 0755 /docker-entrypoint-initdb.d/0.1.pljava-vars.sh

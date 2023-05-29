@@ -1,22 +1,40 @@
 #!/bin/sh
 
+export REPO=beargiles
+
+# ------------------------------------------------------------
+#
+# For simplicity this script is currently limited to the
+# default version of official PostgreSQL images on hub.docker.com.
+#
+# That means PostgreSQL 12, 13, 14, and 15, all using pl/java 1.6.
+#
+# There are official images for PostgreSQL 11 but they are
+# limited to 'alpine' Linux and Debian 'bullseye'
+#
+# There are no official images for PostgreSQL 10 and below.
+#
+# ------------------------------------------------------------
+
 #
 # Build docker images
 #
-/usr/bin/docker build -f Dockerfile    -t beargiles/pljava:14.2 .
-/usr/bin/docker build -f Dockerfile.13 -t beargiles/pljava:13.6 .
-/usr/bin/docker build -f Dockerfile.12 -t beargiles/pljava:12.10 .
-/usr/bin/docker build -f Dockerfile.11 -t beargiles/pljava:11.15 .
-/usr/bin/docker build -f Dockerfile.10 -t beargiles/pljava:10.20 .
+for pg_version in 12.15 13.11 14.8 15.3
+do
+  pg_major=${pg_version%%.*}
+  echo $pg_version $pg_major_version
 
-#
-# Add tags
-#
-/usr/bin/docker tag beargiles/pljava:14.2 beargiles/pljava:latest
-/usr/bin/docker tag beargiles/pljava:14.2 beargiles/pljava:14
-/usr/bin/docker tag beargiles/pljava:13.6 beargiles/pljava:13
-/usr/bin/docker tag beargiles/pljava:12.10 beargiles/pljava:12
-/usr/bin/docker tag beargiles/pljava:11.15 beargiles/pljava:11
-/usr/bin/docker tag beargiles/pljava:10.20 beargiles/pljava:10
+  /usr/bin/docker build -f Dockerfile \
+    --build-arg POSTGRES_VERSION=${pg_version} \
+    --build-arg POSTGRES_MAJOR=${pg_major} \
+    -t ${REPO}/pljava:${pg_version} .
 
+  /usr/bin/docker tag $REPO/pljava:${pg_version} beargiles/pljava:${pg_major}
+
+  if [ ${pg_major} = 15 ]; then
+    /usr/bin/docker tag $REPO/pljava:${pg_major} beargiles/pljava:latest
+  fi
+
+  # now push the results...
+done
 
