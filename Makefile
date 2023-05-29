@@ -4,7 +4,7 @@
 # When processing the rules for tagging and pushing container images with the
 # "latest" tag, the following variable will be the version that is considered
 # to be the latest.
-LATEST_VERSION=15-3
+LATEST_VERSION=15
 
 # The following flags are set based on VERSION and VARIANT environment variables
 # that may have been specified, and are used by rules to determine which
@@ -28,11 +28,8 @@ ifdef VERSION
             do_alpine=true
         endif
     endif
-    ifeq ("$(wildcard $(VERSION)/alpine)","") # If no alpine subdirectory exists, don't process the alpine version
-        do_alpine=false
-    endif
 else # If no version was specified, VERSIONS should contain all versions
-    VERSIONS = $(foreach df,$(wildcard */Dockerfile),$(df:%/Dockerfile=%))
+    #VERSIONS = $(foreach df,$(wildcard */Dockerfile),$(df:%/Dockerfile=%))
 endif
 
 # The "latest" tag will only be provided for default images (no variant) so
@@ -87,14 +84,12 @@ ifeq ($(do_default),true)
 	$(DOCKER) images   $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)
 endif
 ifeq ($(do_alpine),true)
-ifneq ("$(wildcard $1/alpine)","")
 	$(DOCKER) build --file Dockerfile.alpine \
                         --pull \
                         --build-arg POSTGRES_VERSION=$(shell echo $1) \
                         --build-arg POSTGRES_MAJOR=$(shell echo $1) \
                         -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine .
 	$(DOCKER) images   $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine
-endif
 endif
 endef
 $(foreach version,$(VERSIONS),$(eval $(call build-version,$(version))))
@@ -103,9 +98,6 @@ $(foreach version,$(VERSIONS),$(eval $(call build-version,$(version))))
 ## RULES FOR TESTING ###
 
 test-prepare:
-#ifeq ("$(wildcard $(OFFIMG_LOCAL_CLONE))","")
-#	$(GIT) clone $(OFFIMG_REPO_URL) $(OFFIMG_LOCAL_CLONE)
-#endif
 
 test: $(foreach version,$(VERSIONS),test-$(version))
 
@@ -146,9 +138,7 @@ ifeq ($(do_default),true)
 	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):$(version)
 endif
 ifeq ($(do_alpine),true)
-ifneq ("$(wildcard $1/alpine)","")
 	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):$(version)-alpine
-endif
 endif
 endef
 $(foreach version,$(VERSIONS),$(eval $(call push-version,$(version))))
