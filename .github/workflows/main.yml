@@ -26,8 +26,6 @@ jobs:
       VERSION: ${{ matrix.postgres }}
       VARIANT: ${{ matrix.variant }}
 
-    runs-on: ubuntu-22.04
-
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
