@@ -12,13 +12,22 @@ EXPOSE 5432
 VOLUME /var/log/postgresql/
 VOLUME /docker-entrypoint-initdb.d/
 
-# Update apt and current packages
-RUN /usr/bin/apt-get update && apt-get upgrade -y
+# Update apt and current packages. I used two lines, instead
+# of the recommended single line, in order to make it clear
+# that I was setting the DEBIAN_FRONTEND value on the upgrade.
+# (Due to updating postgresql-common)
+#
+RUN /usr/bin/apt-get update
+RUN DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get upgrade -y
 
-# Install pljava, pgtap, and pgxnclient
-RUN /usr/bin/apt-get install -y postgresql-${POSTGRES_MAJOR}-pljava \
-    postgresql-${POSTGRES_MAJOR}-pgtap pgxnclient \
-    libsaxon-java libsaxonb-java libpostgresql-jdbc-java
+# Install pljava, pgtap, and pgxnclient, plus a few packages
+# useful for manual tasks later.
+RUN DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get install -y \
+    postgresql-${POSTGRES_MAJOR}-pljava \
+    postgresql-${POSTGRES_MAJOR}-pgtap \
+    pgxnclient \
+    libsaxon-java libsaxonb-java libpostgresql-jdbc-java \
+    apt-utils whiptail
 
 # Remove cached files, unnecessary packages, etc.
 RUN /usr/bin/apt-get autoclean && apt-get autoremove
