@@ -26,8 +26,8 @@ jobs:
       VARIANT: ${{ matrix.variant }}
 
     steps:
-    - name: Checkout source
-      uses: actions/checkout@v3
+    # name: Checkout source
+    # uses: actions/checkout@v3
 
     - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
       run: make test
