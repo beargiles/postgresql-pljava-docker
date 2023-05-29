@@ -127,9 +127,7 @@ tag-latest: $(BUILD_LATEST_DEP)
 
 ### RULES FOR PUSHING ###
 
-# push: $(foreach version,$(VERSIONS),push-$(version)) $(PUSH_DEP)
-
-push: $(foreach version,$(VERSIONS),push-$(version))
+push: $(foreach version,$(VERSIONS),push-$(version)) $(PUSH_DEP)
 
 # TODO: restore dependency on test-$1
 define push-version
