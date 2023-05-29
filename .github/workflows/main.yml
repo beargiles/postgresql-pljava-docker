@@ -14,21 +14,21 @@ defaults:
 jobs:
 
   make-docker-images:
-    strategy:
-      matrix:
-        postgres: [15]
-        variant: [default]
+    # strategy:
+    #   matrix:
+    #     postgres: [15]
+    #     variant: [default]
 
     name: Build docker image for ${{ matrix.postgres }} variant ${{ matrix.variant }}
     runs-on: ubuntu-22.04
-    env:
-      VERSION: ${{ matrix.postgres }}
-      VARIANT: ${{ matrix.variant }}
+    # env:
+    #   VERSION: ${{ matrix.postgres }}
+    #   VARIANT: ${{ matrix.variant }}
 
     steps:
-    # name: Checkout source
-    # uses: actions/checkout@v3
+      name: Checkout source
+      uses: actions/checkout@v3
 
-    - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
-      run: make test
+    # name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
+    # run: make test
 
