@@ -5,13 +5,12 @@
 ARG POSTGRES_VERSION
 FROM postgres:${POSTGRES_VERSION}
 
-ARG POSTGRES_MAJOR
-
 LABEL maintainer="Bear Giles <bgiles@coyotesong.com>" \
       org.opencontainers.image.description="PL/Java language extension with PostgreSQL (on Debian)" \
       org.opencontainers.image.source="https://github.com/beargiles/postgresql-pljava-docker"
 
-POSTGRES_MAJOR
+ARG POSTGRES_MAJOR
+
 EXPOSE 5432
 
 VOLUME /var/log/postgresql/
