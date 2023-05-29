@@ -100,12 +100,14 @@ test-prepare:
 #	$(GIT) clone $(OFFIMG_REPO_URL) $(OFFIMG_LOCAL_CLONE)
 #endif
 
-test: $(foreach version,$(VERSIONS),test $(version))
+test: $(foreach version,$(VERSIONS),test-$(version))
 
 define test-version
-test-$1: test-prepare build-$1
+test-$1:
+# test-$1: test-prepare build-$1
 echo "version: $version"
 endef
+$(foreach version,$(VERSIONS),$(eval $(call test-version,$(version))))
 
 #ifeq ($(do_default),true)
 #echo "running version: $version, conf: $(OFFIMG_LOCAL_CLONE), repo: $(REPO_NAME), image_name: ${IMAGE_NAME)"
@@ -118,7 +120,7 @@ endef
 #endif
 #endif
 #endef
-#$(foreach version,$(VERSIONS),$(eval $(call test-version,$(version))))
+
 
 
 ### RULES FOR TAGGING ###
