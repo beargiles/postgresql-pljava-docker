@@ -148,6 +148,7 @@ ifneq ("$(wildcard $1/alpine)","")
 endif
 endif
 endef
+$(foreach version,$(VERSIONS),$(eval $(call test-version,$(version))))
 $(foreach version,$(VERSIONS),$(eval $(call push-version,$(version))))
 
 push-latest: tag-latest $(PUSH_LATEST_DEP)
