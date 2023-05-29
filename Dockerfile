@@ -13,7 +13,7 @@ VOLUME /var/log/postgresql/
 VOLUME /docker-entrypoint-initdb.d/
 
 # Update apt and current packages
-RUN /usr/bin/apt-get update && apt-get upgrade
+RUN /usr/bin/apt-get update && apt-get upgrade -y
 
 # Install pljava, pgtap, and pgxnclient
 RUN /usr/bin/apt-get install -y postgresql-${POSTGRES_MAJOR}-pljava \
