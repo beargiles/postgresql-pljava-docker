@@ -79,16 +79,16 @@ echo "$(DOCKER) run --rm -v $$(pwd):/work -w /work buildpack-deps ./update.sh"
 define build-version
 build-$1:
 echo "$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1"
-ifeq ($(do_default),true)
-	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
-	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)
-endif
-ifeq ($(do_alpine),true)
-ifneq ("$(wildcard $1/alpine)","")
-	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
-	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine
-endif
-endif
+#ifeq ($(do_default),true)
+#	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
+#	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)
+#endif
+#ifeq ($(do_alpine),true)
+#ifneq ("$(wildcard $1/alpine)","")
+#	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
+#	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine
+#endif
+#endif
 endef
 $(foreach version,$(VERSIONS),$(eval $(call build-version,$(version))))
 
@@ -105,16 +105,16 @@ test: $(foreach version,$(VERSIONS),test-$(version))
 define test-version
 test-$1: test-prepare build-$1
 echo "version: $version"
-ifeq ($(do_default),true)
-echo "running version: $version, conf: $(OFFIMG_LOCAL_CLONE), repo: $(REPO_NAME), image_name: ${IMAGE_NAME)"
+#ifeq ($(do_default),true)
+#echo "running version: $version, conf: $(OFFIMG_LOCAL_CLONE), repo: $(REPO_NAME), image_name: ${IMAGE_NAME)"
 #	$(OFFIMG_LOCAL_CLONE)/test/run.sh -c $(OFFIMG_LOCAL_CLONE)/test/config.sh -c test/postgis-config.sh $(REPO_NAME)/$(IMAGE_NAME):$(version)
-endif
-ifeq ($(do_alpine),true)
-echo "running version: $version, conf: $(OFFIMG_LOCAL_CLONE), repo: $(REPO_NAME), image_name: ${IMAGE_NAME)"
+#endif
+#ifeq ($(do_alpine),true)
+#echo "running version: $version, conf: $(OFFIMG_LOCAL_CLONE), repo: $(REPO_NAME), image_name: ${IMAGE_NAME)"
 #ifneq ("$(wildcard $1/alpine)","")
 #	$(OFFIMG_LOCAL_CLONE)/test/run.sh -c $(OFFIMG_LOCAL_CLONE)/test/config.sh -c test/postgis-config.sh $(REPO_NAME)/$(IMAGE_NAME):$(version)-alpine
 #endif
-endif
+#endif
 endef
 $(foreach version,$(VERSIONS),$(eval $(call test-version,$(version))))
 
