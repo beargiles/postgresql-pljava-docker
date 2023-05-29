@@ -82,7 +82,8 @@ echo "$(DOCKER) run --rm -v $$(pwd):/work -w /work buildpack-deps ./update.sh"
 define build-version
 build-$1:
 ifeq ($(do_default),true)
-	$(DOCKER) build --pull true \
+	$(DOCKER) build --file Dockerfile \
+                        --pull \
                         --build-arg POSTGRES_VERSION=$(shell echo $1) \
                         --build-arg POSTGRES_MAJOR=$(shell echo $1) \
                         -t $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):test-$(shell echo $1) .
