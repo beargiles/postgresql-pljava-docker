@@ -28,3 +28,9 @@ jobs:
     steps:
     - name: Checkout source
       uses: actions/checkout@v3
+
+    - run: echo "vars: ${{ env.VERSION }} - ${{ env.VARIANT }}"
+
+    - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
+      run: make test
+

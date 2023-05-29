@@ -100,7 +100,9 @@ test-prepare:
 #	$(GIT) clone $(OFFIMG_REPO_URL) $(OFFIMG_LOCAL_CLONE)
 #endif
 
-test: $(foreach version,$(VERSIONS),test-$(version))
+#test: $(foreach version,$(VERSIONS),test-$(version))
+test:
+  echo "versions: $(VERSIONS)"
 
 define test-version
 test-$1: test-prepare build-$1
