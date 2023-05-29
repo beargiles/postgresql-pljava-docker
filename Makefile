@@ -100,12 +100,11 @@ test-prepare:
 #	$(GIT) clone $(OFFIMG_REPO_URL) $(OFFIMG_LOCAL_CLONE)
 #endif
 
-#test: $(foreach version,$(VERSIONS),test-$(version))
-test:
-  echo "versions: $(VERSIONS)"
+test: $(foreach version,$(VERSIONS),test-$(version))
 
 define test-version
 test-$1: test-prepare build-$1
+echo "version: $version"
 ifeq ($(do_default),true)
 echo "running version: $version, conf: $(OFFIMG_LOCAL_CLONE), repo: $(REPO_NAME), image_name: ${IMAGE_NAME)"
 #	$(OFFIMG_LOCAL_CLONE)/test/run.sh -c $(OFFIMG_LOCAL_CLONE)/test/config.sh -c test/postgis-config.sh $(REPO_NAME)/$(IMAGE_NAME):$(version)
