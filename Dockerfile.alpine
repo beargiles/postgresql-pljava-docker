@@ -17,7 +17,7 @@ VOLUME /docker-entrypoint-initdb.d/
 
 # Install pljava, pgtap, and pgxnclient
 RUN set -eux \
-    && apt add --no-cache --virtual .fetch-deps \
+    && apk add --no-cache --virtual .fetch-deps \
        postgresql-${POSTGRES_MAJOR}-pljava \
        postgresql-${POSTGRES_MAJOR}-pgtap \
        pgxnclient \
