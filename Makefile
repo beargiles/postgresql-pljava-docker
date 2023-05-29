@@ -54,8 +54,8 @@ endif
 
 # The repository and image names default to the official but can be overriden
 # via environment variables.
-REPO_NAME  ?= beargiles
-IMAGE_NAME ?= pljava
+REPO_NAME  ?= docker-library
+IMAGE_NAME ?= postgres
 
 DOCKER=docker
 #  DOCKERHUB_DESC_IMG=peterevans/dockerhub-description:latest   <!--------------------- bgiles!
@@ -79,16 +79,16 @@ echo "$(DOCKER) run --rm -v $$(pwd):/work -w /work buildpack-deps ./update.sh"
 define build-version
 build-$1:
 echo "$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1"
-#ifeq ($(do_default),true)
-#	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
-#	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)
-#endif
-#ifeq ($(do_alpine),true)
-#ifneq ("$(wildcard $1/alpine)","")
-#	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
-#	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine
-#endif
-#endif
+ifeq ($(do_default),true)
+	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
+	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)
+endif
+ifeq ($(do_alpine),true)
+ifneq ("$(wildcard $1/alpine)","")
+	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
+	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine
+endif
+endif
 endef
 $(foreach version,$(VERSIONS),$(eval $(call build-version,$(version))))
 
