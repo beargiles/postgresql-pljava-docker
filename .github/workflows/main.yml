@@ -15,8 +15,8 @@ jobs:
   make-docker-images:
     strategy:
       matrix: 
-        postgres: [15]
-        variant: [default, alpine]
+        postgres: [15, 14, 13, 12]
+        variant: [default]
 
 
     name: Build docker image for PostgreSQL-${{ matrix.postgres }}, variant ${{ matrix.variant }}
