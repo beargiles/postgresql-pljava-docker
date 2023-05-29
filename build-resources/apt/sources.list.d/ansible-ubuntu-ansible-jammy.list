@@ -1,0 +1,2 @@
+deb [arch=amd64 signed-by=/usr/share/keyrings/ppa-ansible-keyring.gpg] https://ppa.launchpadcontent.net/ansible/ansible/ubuntu/ jammy main
+# deb-src https://ppa.launchpadcontent.net/ansible/ansible/ubuntu/ jammy main

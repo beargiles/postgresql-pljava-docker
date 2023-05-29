@@ -1,0 +1,40 @@
+# ------------------------------------------------------
+#
+# Get list of images I've already built...
+# This functionality does not appear to be present in community.docker
+#
+# TODO - submit community.docker enhancement.
+#
+# ------------------------------------------------------
+#
+# Requires:
+#   - repo - name of docker repository
+#
+# Provides:
+#   - full_tags - 'root' versions in that repo. (Postgres specific)
+#   - latest_major_tag - latest major vesions in that repo. (Postgres specific)
+---
+- name: Request docker hub auth token
+  ansible.builtin.uri:
+    url: 'https://auth.docker.io/token?service=registry.docker.io&scope=repository:{{ repo }}:pull'
+    return_content: true
+    status_code: 200
+  register: docker_hub_auth_token_resp
+
+- name: Request tags
+  ansible.builtin.uri:
+    url: 'https://registry-1.docker.io/v2/{{ repo }}/tags/list'
+    headers:
+      Authorization: 'Bearer {{ docker_hub_auth_token_resp.json.access_token }}'
+    return_content: true
+    status_code: 200
+  register: tags_resp
+
+- name: Capture any matching tags
+  vars:
+    list_of_null:
+      - null
+    all_tags: "{{ tags_resp.json.tags | map('regex_search', '^((1[2-9])|([2-9][0-9]))\\.[^-]+?$') | list | unique | difference(list_of_null) }}"
+  ansible.builtin.set_fact:
+    full_tags: '{{ all_tags }}'
+    latest_major_tag: "{{ all_tags | map('regex_replace', '^([0-9]+).*$', '\\1') | list | unique | sort(reverse = true) | first() }}"
