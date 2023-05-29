@@ -7,7 +7,7 @@ FROM postgres:${POSTGRES_VERSION}-alpine
 ARG POSTGRES_MAJOR
 
 LABEL maintainer="Bear Giles <bgiles@coyotesong.com>" \
-      org.opencontainers.image.description="PL/Java language extension with PostgreSQL ${POSTGRES_MAJOR} Alpine" \
+      org.opencontainers.image.description="PL/Java language extension with PostgreSQL (on Alpine)" \
       org.opencontainers.image.source="https://github.com/beargiles/postgresql-pljava-docker"
 
 EXPOSE 5432

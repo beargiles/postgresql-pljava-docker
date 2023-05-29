@@ -19,7 +19,7 @@ jobs:
         variant: [default, alpine]
 
 
-    name: Build docker image for ${{ matrix.postgres }} variant ${{ matrix.variant }}
+    name: Build docker image for PostgreSQL-${{ matrix.postgres }}, variant ${{ matrix.variant }}
 
     runs-on: ubuntu-22.04
     env:
