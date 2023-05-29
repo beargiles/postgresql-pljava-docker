@@ -110,7 +110,7 @@ test: $(foreach version,$(VERSIONS),test-$(version))
 
 define test-version
 test-$1: test-prepare build-$1
-rndef
+endef
 $(foreach version,$(VERSIONS),$(eval $(call test-version,$(version))))
 
 #ifeq ($(do_default),true)
