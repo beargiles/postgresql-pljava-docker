@@ -81,17 +81,19 @@ echo "$(DOCKER) run --rm -v $$(pwd):/work -w /work buildpack-deps ./update.sh"
 
 define build-version
 build-$1:
-echo "$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1"
 ifeq ($(do_default),true)
-	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
-	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)
+	$(DOCKER) build --pull true \
+                        --build-arg POSTGRES_VERSION=$(shell echo $1) \
+                        --build-arg POSTGRES_MAJOR=$(shell echo $1) \
+                        -t $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):test-$(shell echo $1) .
+	# $(DOCKER) images          $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):test-$(shell echo $1)
 endif
-ifeq ($(do_alpine),true)
-ifneq ("$(wildcard $1/alpine)","")
-	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
-	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine
-endif
-endif
+#ifeq ($(do_alpine),true)
+#ifneq ("$(wildcard $1/alpine)","")
+#	$(DOCKER) build --pull -t $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
+#	$(DOCKER) images          $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):$(shell echo $1)-alpine
+#endif
+#endif
 endef
 $(foreach version,$(VERSIONS),$(eval $(call build-version,$(version))))
 
@@ -99,9 +101,9 @@ $(foreach version,$(VERSIONS),$(eval $(call build-version,$(version))))
 ## RULES FOR TESTING ###
 
 test-prepare:
-#ifeq ("$(wildcard $(OFFIMG_LOCAL_CLONE))","")
-#	$(GIT) clone $(OFFIMG_REPO_URL) $(OFFIMG_LOCAL_CLONE)
-#endif
+ifeq ("$(wildcard $(OFFIMG_LOCAL_CLONE))","")
+	$(GIT) clone $(OFFIMG_REPO_URL) $(OFFIMG_LOCAL_CLONE)
+endif
 
 test: $(foreach version,$(VERSIONS),test-$(version))
 
