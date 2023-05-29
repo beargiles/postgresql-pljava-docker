@@ -83,8 +83,8 @@ ifeq ($(do_default),true)
                         --pull \
                         --build-arg POSTGRES_VERSION=$(shell echo $1) \
                         --build-arg POSTGRES_MAJOR=$(shell echo $1) \
-                        -t $(REPO_NAME)/$(IMAGE_NAME):t-$(shell echo $1) .
-	$(DOCKER) images   $(REPO_NAME)/$(IMAGE_NAME):t-$(shell echo $1)
+                        -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) .
+	$(DOCKER) images   $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)
 endif
 #ifeq ($(do_alpine),true)
 #ifneq ("$(wildcard $1/alpine)","")
@@ -138,13 +138,12 @@ push: $(foreach version,$(VERSIONS),push-$(version))
 # TODO: restore dependency on test-$1
 define push-version
 push-$1:
-echo "$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):t-$(version)"
-#ifeq ($(do_default),true)
-#	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):t-$(version)
-#endif
+ifeq ($(do_default),true)
+	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):$(version)
+endif
 ifeq ($(do_alpine),true)
 ifneq ("$(wildcard $1/alpine)","")
-	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):t-$(version)-alpine
+	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):$(version)-alpine
 endif
 endif
 endef
