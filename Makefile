@@ -54,11 +54,8 @@ endif
 
 # The repository and image names default to the official but can be overriden
 # via environment variables.
-REPO_NAME  ?= docker-library
-IMAGE_NAME ?= postgres
-
-DEST_REPO_NAME  ?= beargiles
-DEST_IMAGE_NAME ?= pljava
+REPO_NAME  ?= beargiles
+IMAGE_NAME ?= pljava
 
 DOCKER=docker
 #  DOCKERHUB_DESC_IMG=peterevans/dockerhub-description:latest   <!--------------------- bgiles!
@@ -86,13 +83,13 @@ ifeq ($(do_default),true)
                         --pull \
                         --build-arg POSTGRES_VERSION=$(shell echo $1) \
                         --build-arg POSTGRES_MAJOR=$(shell echo $1) \
-                        -t $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):test-$(shell echo $1) .
-	$(DOCKER) images   $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):test-$(shell echo $1)
+                        -t $(REPO_NAME)/$(IMAGE_NAME):test-$(shell echo $1) .
+	$(DOCKER) images   $(REPO_NAME)/$(IMAGE_NAME):test-$(shell echo $1)
 endif
 #ifeq ($(do_alpine),true)
 #ifneq ("$(wildcard $1/alpine)","")
-#	$(DOCKER) build --pull -t $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
-#	$(DOCKER) images          $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):$(shell echo $1)-alpine
+#	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
+#	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine
 #endif
 #endif
 endef
@@ -129,7 +126,7 @@ $(foreach version,$(VERSIONS),$(eval $(call test-version,$(version))))
 ### RULES FOR TAGGING ###
 
 tag-latest: $(BUILD_LATEST_DEP)
-	$(DOCKER) image tag $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):$(LATEST_VERSION) $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):latest
+	$(DOCKER) image tag $(REPO_NAME)/$(IMAGE_NAME):$(LATEST_VERSION) $(REPO_NAME)/$(IMAGE_NAME):latest
 
 
 ### RULES FOR PUSHING ###
@@ -139,25 +136,25 @@ push: $(foreach version,$(VERSIONS),push-$(version)) $(PUSH_DEP)
 # TODO: restore dependency on test-$1
 define push-version
 push-$1:
-echo "$(DOCKER) image push $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):test-$(version)"
+echo "$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):test-$(version)"
 #ifeq ($(do_default),true)
-#	$(DOCKER) image push $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):test-$(version)
+#	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):test-$(version)
 #endif
 ifeq ($(do_alpine),true)
 ifneq ("$(wildcard $1/alpine)","")
-	$(DOCKER) image push $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):test-$(version)-alpine
+	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):test-$(version)-alpine
 endif
 endif
 endef
 $(foreach version,$(VERSIONS),$(eval $(call push-version,$(version))))
 
 push-latest: tag-latest $(PUSH_LATEST_DEP)
-	echo "$(DOCKER) image push $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):latest"
-	# $(DOCKER) image push $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):latest
+	echo "$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):latest"
+	# $(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):latest
 	# @$(DOCKER) run -v "$(PWD)":/workspace \
         #               -e DOCKERHUB_USERNAME='$(DOCKERHUB_USERNAME)' \
         #               -e DOCKERHUB_PASSWORD='$(DOCKERHUB_ACCESS_TOKEN)' \
-        #               -e DOCKERHUB_REPOSITORY='$(DEST_REPO_NAME)/$(DEST_IMAGE_NAME)' \
+        #               -e DOCKERHUB_REPOSITORY='$(REPO_NAME)/$(IMAGE_NAME)' \
         #               -e README_FILEPATH='/workspace/README.md' $(DOCKERHUB_DESC_IMG)
 
 
