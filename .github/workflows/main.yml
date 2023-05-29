@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix: 
         postgres: [15]
-        variant: [default]
+        variant: [default, alpine]
 
 
     name: Build docker image for ${{ matrix.postgres }} variant ${{ matrix.variant }}
@@ -32,7 +32,6 @@ jobs:
 
       - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
         run: make all
-
 
       - name: Login to dockerhub
         uses: docker/login-action@v1

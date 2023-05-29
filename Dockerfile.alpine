@@ -1,0 +1,30 @@
+#
+# 
+#
+ARG POSTGRES_VERSION
+FROM postgres:${POSTGRES_VERSION}-alpine
+
+ARG POSTGRES_MAJOR
+
+LABEL maintainer="Bear Giles <bgiles@coyotesong.com>" \
+      org.opencontainers.image.description="PL/Java language extension with PostgreSQL ${POSTGRES_MAJOR} Alpine" \
+      org.opencontainers.image.source="https://github.com/beargiles/postgresql-pljava-docker"
+
+EXPOSE 5432
+
+VOLUME /var/log/postgresql/
+VOLUME /docker-entrypoint-initdb.d/
+
+# Install pljava, pgtap, and pgxnclient
+RUN set -eux \
+    && apt add --no-cache --virtual .fetch-deps \
+       postgresql-${POSTGRES_MAJOR}-pljava \
+       postgresql-${POSTGRES_MAJOR}-pgtap \
+       pgxnclient \
+       libsaxon-java libsaxonb-java libpostgresql-jdbc-java
+
+# Create 'pljava' extension on launch
+COPY docker-entrypoint-initdb.d/ /docker-entrypoint-initdb.d/
+RUN /bin/cp /usr/share/postgresql/${POSTGRES_MAJOR}/pljava/pljava-examples-1.6.*.jar /tmp/pljava-examples-1.6.jar
+
+RUN /bin/chmod 0755 /docker-entrypoint-initdb.d/0.1.pljava-vars.sh

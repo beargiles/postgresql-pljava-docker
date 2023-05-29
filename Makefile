@@ -86,12 +86,16 @@ ifeq ($(do_default),true)
                         -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) .
 	$(DOCKER) images   $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)
 endif
-#ifeq ($(do_alpine),true)
-#ifneq ("$(wildcard $1/alpine)","")
-#	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
-#	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine
-#endif
-#endif
+ifeq ($(do_alpine),true)
+ifneq ("$(wildcard $1/alpine)","")
+	$(DOCKER) build --file Dockerfile.alpine \
+                        --pull \
+                        --build-arg POSTGRES_VERSION=$(shell echo $1) \
+                        --build-arg POSTGRES_MAJOR=$(shell echo $1) \
+                        -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine .
+	$(DOCKER) images   $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine
+endif
+endif
 endef
 $(foreach version,$(VERSIONS),$(eval $(call build-version,$(version))))
 
