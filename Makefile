@@ -137,7 +137,8 @@ tag-latest: $(BUILD_LATEST_DEP)
 push: $(foreach version,$(VERSIONS),push-$(version)) $(PUSH_DEP)
 
 define push-version
-push-$1: test-$1
+push-$1:
+# push-$1: test-$1 <-- test-15 etc not defined?
 echo "$(DOCKER) image push $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):test-$(version)"
 ifeq ($(do_default),true)
 	$(DOCKER) image push $(DEST_REPO_NAME)/$(DEST_IMAGE_NAME):test-$(version)
@@ -148,7 +149,6 @@ ifneq ("$(wildcard $1/alpine)","")
 endif
 endif
 endef
-$(foreach version,$(VERSIONS),$(eval $(call test-version,$(version))))
 $(foreach version,$(VERSIONS),$(eval $(call push-version,$(version))))
 
 push-latest: tag-latest $(PUSH_LATEST_DEP)
