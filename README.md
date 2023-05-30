@@ -26,12 +26,21 @@ using the Java Ahead-of-Time Compiler (`jaotc`). The PL/Java documentation refer
 [Quicker Clojure startup with AppCDS and AOT](https://web.archive.org/web/20191022103258/http://blog.gilliard.lol/2017/10/04/AppCDS-and-Clojure.html)
 for an example of this.
 
-
 # What is in this docker image?
 
 This docker image extends the official [Postgres docker hub image](https://hub.docker.com/_/postgres)
 extended to include the [pljava](https://github.com/tada/pljava/wiki) procedural language. The image
 also installs pgTAP and pgxnclient.
+
+## How often is us updated?
+
+The CI/CD will check for new upstream docker images once a week, and will rebuild and redeploy
+docker images as required.
+
+Note: the CI/CD does not yet have the ability to tag images with their minor release - you'll
+only see the major version number even when the image is updated. I know how to fix this... but
+hit the 'max pulls' limit on github while refining it so it will only rebuild fairly recent
+images.
 
 ## What is pgTAP?
 
@@ -145,12 +154,4 @@ includes two additional docker images.
 # Source code
 
 The source code is located at [github.com/beargiles/postgresql-pljava-docker](https://github.com/beargiles/postgresql-pljava-docker).
-
-# PL/Java prebuild distribution information:
-
-- {1.6.4,"14.2 (Debian 14.2-1.pgdg110+1)",11.0.14,Linux,amd64}
-- {1.6.4,"13.6 (Debian 13.6-1.pgdg110+1)",11.0.14,Linux,amd64}
-- {1.6.4,"12.10 (Debian 12.10-1.pgdg110+1)",11.0.14,Linux,amd64}
-- {1.5.6,"11.15 (Debian 11.15-1.pgdg90+1)",1.8.0_322,Linux,amd64}
-- {1.5.6,"10.20 (Debian 10.20-1.pgdg90+1)",1.8.0_322,Linux,amd64}
 
