@@ -2,10 +2,10 @@ name: Docker PostgreSQL pl/java CI
 
 on:
   push:
-  pull_request:
+    branches:
+      - 'github-actions'
   schedule:
     - cron: '15 5 * * 1'
-  workflow_dispatch:
 
 defaults:
   run:
