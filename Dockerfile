@@ -6,7 +6,7 @@ ARG POSTGRES_VERSION
 FROM postgres:${POSTGRES_VERSION}
 
 LABEL maintainer="Bear Giles <bgiles@coyotesong.com>" \
-      org.opencontainers.image.description="PL/Java language extension with PostgreSQL (on Debian)" \
+      org.opencontainers.image.description="PostgreSQL with PL/Java extension preinstalled (Debian)" \
       org.opencontainers.image.source="https://github.com/beargiles/postgresql-pljava-docker"
 
 ARG POSTGRES_MAJOR

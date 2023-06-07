@@ -13,39 +13,24 @@ defaults:
 jobs:
 
   make-docker-images:
-    strategy:
-      matrix: 
-        postgres: [15, 14, 13, 12]
-        variant: [default]
-
-
     name: Build docker image for PostgreSQL-${{ matrix.postgres }}, variant ${{ matrix.variant }}
 
     runs-on: ubuntu-22.04
-    env:
-      VERSION: ${{ matrix.postgres }}
-      VARIANT: ${{ matrix.variant }}
 
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
-        run: make all
+      - name: Install ansible
+        run: install-ansible.sh
 
       - name: Login to dockerhub
         uses: docker/login-action@v1
-        # if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
-        if: ${{ (github.event_name != 'pull_request')  }}
+        if: ${{  (github.ref != 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+        # if: ${{ (github.event_name != 'pull_request')  }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
-      - name: Push docker image to dockerhub
-        # if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
-        if: ${{  (github.event_name != 'pull_request')  }}
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-        run: make push
-
+      - name: Build and push docker images
+        run: /usr/bin/ansible-playbook build.yml
