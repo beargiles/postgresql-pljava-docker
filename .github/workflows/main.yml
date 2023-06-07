@@ -5,6 +5,7 @@ on:
   pull_request:
   schedule:
     - cron: '15 5 * * 1'
+  workflow_dispatch:
 
 defaults:
   run:
