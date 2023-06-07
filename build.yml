@@ -116,4 +116,5 @@
         source: build
       loop: '{{ tags }}'
 
+
      # to do: add 'latest'
