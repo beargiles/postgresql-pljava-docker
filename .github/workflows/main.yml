@@ -21,8 +21,13 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Install ansible (requires root)
+      - name: Install ansible and docker (requires root)
         run: /usr/bin/sudo /usr/bin/bash install-ansible.sh
+
+        # see link for how to add signature verification
+        # https://docs.ansible.com/ansible/latest/collections_guide/collections_installing.html#install-multiple-collections-with-a-requirements-file
+      - name: Install ansible collections (does not require root)
+        run: /usr/bin/ansible-galaxy install -r requirements.txt
 
       - name: Login to dockerhub
         uses: docker/login-action@v1
