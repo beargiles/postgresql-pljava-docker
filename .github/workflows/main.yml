@@ -21,8 +21,8 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Install ansible
-        run: /usr/bin/bash install-ansible.sh
+      - name: Install ansible (requires root)
+        run: /usr/bin/sudo install-ansible.sh
 
       - name: Login to dockerhub
         uses: docker/login-action@v1
