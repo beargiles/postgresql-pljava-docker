@@ -7,8 +7,3 @@
 /usr/bin/apt-get update;
 
 /usr/bin/apt-get install -y ansible ansible-core docker-ce docker-compose-plugin
-
-# see link for how to add signature verification
-# https://docs.ansible.com/ansible/latest/collections_guide/collections_installing.html#install-multiple-collections-with-a-requirements-file
-
-/usr/bin/ansible-galaxy install -r requirements.txt
