@@ -6,6 +6,6 @@
 
 /usr/bin/apt-get update;
 
-/usr/bin/apt-get install -y ansible ansible-core doocker-ce docker-compose-plugin
+/usr/bin/apt-get install -y ansible ansible-core docker-ce docker-compose-plugin
 
 /usr/bin/ansible-galaxy collection install collection.docker
