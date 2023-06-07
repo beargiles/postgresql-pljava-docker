@@ -13,7 +13,7 @@ defaults:
 jobs:
 
   make-docker-images:
-    name: Build docker image for PostgreSQL-${{ matrix.postgres }}, variant ${{ matrix.variant }}
+    name: Build docker images for PostgreSQL
 
     runs-on: ubuntu-22.04
 
@@ -24,10 +24,8 @@ jobs:
       - name: Install ansible and docker (requires root)
         run: /usr/bin/sudo /usr/bin/bash install-ansible.sh
 
-        # see link for how to add signature verification
-        # https://docs.ansible.com/ansible/latest/collections_guide/collections_installing.html#install-multiple-collections-with-a-requirements-file
       - name: Install ansible collections (does not require root)
-        run: /usr/bin/ansible-galaxy install -r requirements.txt
+        run: /usr/bin/ansible-galaxy install -r requirements.yml
 
       - name: Login to dockerhub
         uses: docker/login-action@v1
