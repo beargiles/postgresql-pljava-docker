@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Build and deploy docker images.
+      ansible.builtin.include_role:
+        name: pljava_docker

@@ -13,28 +13,27 @@ defaults:
 
 jobs:
 
-  make-docker-images:
-    name: Build docker images for PostgreSQL
+  build-and-push-docker-images:
+    name: Build and push docker images for PostgreSQL + extensions
 
     runs-on: ubuntu-22.04
+
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
 
       - name: Install ansible and docker (requires root)
-        run: /usr/bin/sudo /usr/bin/bash install-ansible.sh
+        run: /usr/bin/sudo /usr/bin/cp build-resources/apt/sources.list.d/* /etc/apt/sources.list.d
+        run: /usr/bin/sudo /usr/bin/cp build-resources/keyrings/* /usr/share/keyrings
+        run: /usr/bin/sudo /usr/bin/apt-get update
+        run: /usr/bin/sudo /usr/bin/apt-get install -y ansible ansible-core docker-ce docker-compose-plugin
 
       - name: Install ansible collections (does not require root)
-        run: /usr/bin/ansible-galaxy install -r requirements.yml
-
-      - name: Login to dockerhub
-        uses: docker/login-action@v1
-        # if: ${{  (github.ref != 'refs/heads/master') && (github.event_name != 'pull_request')  }}
-        if: ${{ (github.event_name != 'pull_request')  }}
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+        run: /usr/bin/ansible-galaxy install -r src/roles/requirements.yml
 
       - name: Build and push docker images
-        run: /usr/bin/ansible-playbook build.yml
+        run: /usr/bin/ansible-playbook src/build.yml
