@@ -19,7 +19,7 @@
   community.docker.docker_image:
     name: '{{ pgxnclient_name }}'
     build:
-      path: ../docker
+      path: ../../docker
       target: 'pgxnclient'
       args:
         POSTGRES_MAJOR: '{{ pg_major }}'
@@ -31,7 +31,7 @@
   community.docker.docker_image:
     name: '{{ pljava_name }}'
     build:
-      path: ../docker
+      path: ../../docker
       args:
         POSTGRES_MAJOR: '{{ pg_major }}'
         POSTGRES_VERSION: '{{ pg_version }}'
