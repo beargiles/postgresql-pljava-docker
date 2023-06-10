@@ -14,12 +14,13 @@
 - name: Set facts (pg_major)
   ansible.builtin.set_fact:
     pg_major: "{{ pg_version | regex_replace('^([0-9]+).*$', '\\1') }}"
+    dockerfilePath: "{{ lookup('pipe', 'pwd') }}/../docker"
 
 - name: 'Build docker image {{ pg_version }} (for pgxnclient development)'
   community.docker.docker_image:
     name: '{{ pgxnclient_name }}'
     build:
-      path: ../../docker
+      path: '{{ dockerfilePath }}'
       target: 'pgxnclient'
       args:
         POSTGRES_MAJOR: '{{ pg_major }}'
@@ -31,7 +32,7 @@
   community.docker.docker_image:
     name: '{{ pljava_name }}'
     build:
-      path: ../../docker
+      path: '{{ dockerfilePath }}'
       args:
         POSTGRES_MAJOR: '{{ pg_major }}'
         POSTGRES_VERSION: '{{ pg_version }}'

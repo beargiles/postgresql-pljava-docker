@@ -18,13 +18,6 @@
     postgres_tags: '{{ full_tags }}'
     postgres_latest_major_tag: '{{ latest_major_tag }}'
 
-- name: Since I am an idiot
-  ansible.builtin.debug:
-    msg: "Current directory: {{ lookup('env', 'PWD') }}"
-
-- ansible.builtin.debug:
-    msg: "Current directory: {{ lookup('pipe', 'pwd') }}"
-
 - name: Build docker images
   ansible.builtin.include_tasks: build-images.yml
   loop: '{{ tags }}'
