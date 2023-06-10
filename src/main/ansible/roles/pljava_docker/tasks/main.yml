@@ -20,10 +20,10 @@
 
 - name: Since I am an idiot
   ansible.builtin.debug:
-    msg: "Current directory: {{ lookup(env, 'PWD') }}"
+    msg: "Current directory: {{ lookup('env', 'PWD') }}"
 
 - ansible.builtin.debug:
-    msg: "Current directory: {{ lookup(pipe , 'pwd') }}"
+    msg: "Current directory: {{ lookup('pipe', 'pwd') }}"
 
 - name: Build docker images
   ansible.builtin.include_tasks: build-images.yml
