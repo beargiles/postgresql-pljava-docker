@@ -7,3 +7,4 @@ SET client_min_messages TO NOTICE;
 
 CREATE EXTENSION pljava;
 GRANT USAGE ON LANGUAGE java TO public;
+
