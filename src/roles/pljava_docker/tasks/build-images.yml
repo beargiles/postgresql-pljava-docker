@@ -14,13 +14,12 @@
 - name: Set facts (pg_major)
   ansible.builtin.set_fact:
     pg_major: "{{ pg_version | regex_replace('^([0-9]+).*$', '\\1') }}"
-    dockerfilePath: "{{ lookup('pipe', 'pwd') }}/../docker"
 
 - name: 'Build docker image {{ pg_version }} (for pgxnclient development)'
   community.docker.docker_image:
     name: '{{ pgxnclient_name }}'
     build:
-      path: '{{ dockerfilePath }}'
+      path: ../docker
       target: 'pgxnclient'
       args:
         POSTGRES_MAJOR: '{{ pg_major }}'
@@ -32,24 +31,24 @@
   community.docker.docker_image:
     name: '{{ pljava_name }}'
     build:
-      path: '{{ dockerfilePath }}'
+      path: ../docker
       args:
         POSTGRES_MAJOR: '{{ pg_major }}'
         POSTGRES_VERSION: '{{ pg_version }}'
     tag: '{{ pg_version }}'
     source: build
-    source: build
 
-- name: 'Build docker image {{ pg_version }} (for pl/java dev)'
+- name: 'Build docker image {{ pg_version }} (for pl/java development)'
   community.docker.docker_image:
     name: '{{ pljava_dev_name }}'
     build:
-      path: '{{ dockerfilePath }}'
+      path: ../docker
       args:
         POSTGRES_MAJOR: '{{ pg_major }}'
         POSTGRES_VERSION: '{{ pg_version }}'
     tag: '{{ pg_version }}'
     source: build
+
 
 # ------------------------------------------------------
 # Tag local images
@@ -80,7 +79,7 @@
   loop:
     - '{{ pgxnclient_name }}'
     - '{{ pljava_name }}'
-    - '{{ pljava_dev_name }}'
+    - '{{ pljavadev_name }}'
   loop_control:
     loop_var: name
   when: pg_major == postgres_latest_major_tag
