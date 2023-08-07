@@ -84,22 +84,22 @@ Some interesting projects are:
 
 Debian packages
 
-- postgresql-14-asn1oid - ASN.1 OID data type for PostgreSQL
-- postgresql-14-extra-window-functions - Extra Window Functions for PostgreSQL
-- postgresql-14-first-last-agg - PostgreSQL extension providing first and last aggregate functions
-- postgresql-14-hll - HyperLogLog extension for PostgreSQL
-- postgresql-14-hypopg - PostgreSQL extension adding support for hypothetical indexes.
-- postgresql-14-icu-ext - PostgreSQL extension exposing functionality from the ICU library
-- postgresql-14-omnidb - PostgreSQL PL/pgSQL debugger extension for OmniDB
-- postgresql-14-pgpcre - Perl Compatible Regular Expressions (PCRE) extension for PostgreSQL
-- postgresql-14-pg-qualstats - PostgreSQL extension to gather statistics about predicates.
-- postgresql-14-pg-stat-kcache - PostgreSQL extension to gather per-query kernel statistics.
-- postgresql-14-pg-track-settings - PostgreSQL extension tracking of configuration settings
-- postgresql-14-plpgsql-check - plpgsql check extension for PostgreSQL
-- postgresql-14-pointcloud - PostgreSQL extension for storing point cloud (LIDAR) data
-- postgresql-14-powa - PostgreSQL Workload Analyzer -- PostgreSQL 14 extension
-- postgresql-14-q3c - PostgreSQL 14 extension used for indexing the sky
-- postgresql-14-similarity - PostgreSQL similarity functions extension
+- postgresql-15-asn1oid - ASN.1 OID data type for PostgreSQL
+- postgresql-15-extra-window-functions - Extra Window Functions for PostgreSQL
+- postgresql-15-first-last-agg - PostgreSQL extension providing first and last aggregate functions
+- postgresql-15-hll - HyperLogLog extension for PostgreSQL
+- postgresql-15-hypopg - PostgreSQL extension adding support for hypothetical indexes.
+- postgresql-15-icu-ext - PostgreSQL extension exposing functionality from the ICU library
+- postgresql-15-omnidb - PostgreSQL PL/pgSQL debugger extension for OmniDB
+- postgresql-15-pgpcre - Perl Compatible Regular Expressions (PCRE) extension for PostgreSQL
+- postgresql-15-pg-qualstats - PostgreSQL extension to gather statistics about predicates.
+- postgresql-15-pg-stat-kcache - PostgreSQL extension to gather per-query kernel statistics.
+- postgresql-15-pg-track-settings - PostgreSQL extension tracking of configuration settings
+- postgresql-15-plpgsql-check - plpgsql check extension for PostgreSQL
+- postgresql-15-pointcloud - PostgreSQL extension for storing point cloud (LIDAR) data
+- postgresql-15-powa - PostgreSQL Workload Analyzer -- PostgreSQL 14 extension
+- postgresql-15-q3c - PostgreSQL 14 extension used for indexing the sky
+- postgresql-15-similarity - PostgreSQL similarity functions extension
 
 # How does it work?
 
