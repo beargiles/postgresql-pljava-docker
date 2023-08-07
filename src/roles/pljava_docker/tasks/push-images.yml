@@ -1,0 +1,72 @@
+# ------------------------------------------------------
+#
+# Push local images to dockerhub
+#
+# ------------------------------------------------------
+#
+# Requires:
+#  - pg_version - full version of Postgres version
+#
+# Provides:
+#  - pushes docker images to githubs.
+#
+# ------------------------------------------------------
+#
+# Push local images to docker hub
+#
+---
+- name: Set facts (pg_major)
+  ansible.builtin.set_fact:
+    pg_major: "{{ pg_version | regex_replace('^([0-9]+).*$', '\\1') }}"
+
+- name: 'Push docker image {{ pg_version }} (for pgxnclient development)'
+  community.docker.docker_image:
+    name: '{{ pgxnclient_name}}:{{ pg_version }}'
+    repository: '{{ pgxnclient_name }}:{{ pg_version }}'
+    force_tag: true
+    push: true
+    source: local
+
+- name: 'Push docker image {{ pg_major }} (for pgxnclient development)'
+  community.docker.docker_image:
+    name: '{{ pgxnclient_name}}:{{ pg_version }}'
+    repository: '{{ pgxnclient_name }}:{{ pg_major }}'
+    force_tag: true
+    push: true
+    source: local
+
+- name: 'Push docker image {{ pg_version }} (for pl/java)'
+  community.docker.docker_image:
+    name: '{{ pljava_name}}:{{ pg_version }}'
+    repository: '{{ pljava_name }}:{{ pg_version }}'
+    force_tag: true
+    push: true
+    source: local
+
+- name: 'Push docker image {{ pg_major }} (for pl/java)'
+  community.docker.docker_image:
+    name: '{{ pljava_name}}:{{ pg_version }}'
+    repository: '{{ pljava_name }}:{{ pg_major }}'
+    force_tag: true
+    push: true
+    source: local
+
+- name: 'Push docker image {{ pg_version }} (for pl/java development)'
+  community.docker.docker_image:
+    name: '{{ pljava_name}}:{{ pg_version }}'
+    repository: '{{ pljava_dev_name }}:{{ pg_version }}'
+    force_tag: true
+    push: true
+    source: local
+
+- name: 'Push docker image {{ pg_major }} (for pl/java development)'
+  community.docker.docker_image:
+    name: '{{ pljava_dev_name}}:{{ pg_version }}'
+    repository: '{{ pljava_dev_name }}:{{ pg_major }}'
+    force_tag: true
+    push: true
+    source: local
+
+#
+# TO DO - tag 'latest'
+#

@@ -6,7 +6,7 @@
 - name: Create set of tags to build
   ansible.builtin.set_fact:
     tags:
-      - '15.3'
+      - '15.2'
 
 - name: Get list of postgresql tags
   vars:
