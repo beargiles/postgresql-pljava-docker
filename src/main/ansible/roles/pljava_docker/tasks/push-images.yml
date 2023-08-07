@@ -19,38 +19,45 @@
   ansible.builtin.set_fact:
     pg_major: "{{ pg_version | regex_replace('^([0-9]+).*$', '\\1') }}"
 
-- name: 'Push docker image {{ pg_version }} (for pgxnclient development)'
+- name: 'Push docker image {{ pg_version }}'
   community.docker.docker_image:
-    name: '{{ pgxnclient_name}}:{{ pg_version }}'
-    repository: '{{ pgxnclient_name }}:{{ pg_version }}'
+    name: '{{ name }}:{{ pg_version }}'
+    repository: '{{ name }}:{{ pg_version }}'
     force_tag: true
     push: true
     source: local
+  loop:
+    - '{{ pgxnclient_name }}'
+    - '{{ pljava_name }}'
+    - '{{ pljava_dev_name }}
+  loop_control:
+    loop_var: name
 
-- name: 'Push docker image {{ pg_major }} (for pgxnclient development)'
+- name: 'Push docker image {{ pg_major }}'
   community.docker.docker_image:
-    name: '{{ pgxnclient_name}}:{{ pg_version }}'
-    repository: '{{ pgxnclient_name }}:{{ pg_major }}'
+    name: '{{ name }}:{{ pg_version }}'
+    repository: '{{ name }}:{{ pg_major }}'
     force_tag: true
     push: true
     source: local
+  loop:
+    - '{{ pgxnclient_name }}'
+    - '{{ pljava_name }}'
+    - '{{ pljava_dev_name }}
+  loop_control:
+    loop_var: name
 
-- name: 'Push docker image {{ pg_version }} (for pl/java)'
+- name: Push docker image 'latest'
   community.docker.docker_image:
-    name: '{{ pljava_name}}:{{ pg_version }}'
-    repository: '{{ pljava_name }}:{{ pg_version }}'
+    name: '{{ name }}.{{ pg_version }}'
+    repository: '{{ name }}:latest'
     force_tag: true
     push: true
     source: local
-
-- name: 'Push docker image {{ pg_major }} (for pl/java)'
-  community.docker.docker_image:
-    name: '{{ pljava_name}}:{{ pg_version }}'
-    repository: '{{ pljava_name }}:{{ pg_major }}'
-    force_tag: true
-    push: true
-    source: local
-
-#
-# TO DO - tag 'latest'
-#
+  loop:
+    - '{{ pgxnclient_name }}'
+    - '{{ pljava_name }}'
+    - '{{ pljava_dev_name }}
+  loop_control:
+    loop_var: name
+  when: pg_major == postgres_latest_major_tag

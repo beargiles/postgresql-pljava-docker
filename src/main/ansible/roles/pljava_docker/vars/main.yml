@@ -4,6 +4,7 @@
 postgres_name: library/postgres
 pgxnclient_name: beargiles/postgres-pgxnclient
 pljava_name: beargiles/postgres-pljava
+pljava_dev_name: beargiles/postgres-pljava-dev
 
 # we can ignore tese tags since the release is so old.
 seed_tags:

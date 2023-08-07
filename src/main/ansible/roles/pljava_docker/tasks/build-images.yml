@@ -38,6 +38,18 @@
         POSTGRES_VERSION: '{{ pg_version }}'
     tag: '{{ pg_version }}'
     source: build
+    source: build
+
+- name: 'Build docker image {{ pg_version }} (for pl/java dev)'
+  community.docker.docker_image:
+    name: '{{ pljava_dev_name }}'
+    build:
+      path: '{{ dockerfilePath }}'
+      args:
+        POSTGRES_MAJOR: '{{ pg_major }}'
+        POSTGRES_VERSION: '{{ pg_version }}'
+    tag: '{{ pg_version }}'
+    source: build
 
 # ------------------------------------------------------
 # Tag local images
@@ -51,6 +63,7 @@
   loop:
     - '{{ pgxnclient_name }}'
     - '{{ pljava_name }}'
+    - '{{ pljava_dev_name }}'
   loop_control:
     loop_var: name
 
@@ -67,6 +80,7 @@
   loop:
     - '{{ pgxnclient_name }}'
     - '{{ pljava_name }}'
+    - '{{ pljava_dev_name }}'
   loop_control:
     loop_var: name
   when: pg_major == postgres_latest_major_tag
