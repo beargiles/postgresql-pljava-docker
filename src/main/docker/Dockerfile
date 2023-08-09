@@ -86,8 +86,13 @@ ARG JAVA_VERSION=17    # from inspecting upstream docker image
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# add apt source repository
+COPY pgdg-keyring.gpg /usr/share/keyrings/pgdg-keyring.gpg
+COPY pgdg-src.list /etc/apt/sources.list.d/pgdg-src.list
+
 # install git, java, C compiler, and libraries
-RUN /usr/bin/apt-get install -y \
+RUN /usr/bin/apt-get update && \
+    /usr/bin/apt-get install -y \
       git \
       openjdk-${JAVA_VERSION}-jdk \
       maven \
