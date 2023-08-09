@@ -108,7 +108,7 @@ RUN /usr/bin/apt-get autoclean && /usr/bin/apt-get autoremove
 # the latter allows us to build a new deb package with the local changes
 WORKDIR /usr/local/src
 RUN /usr/bin/git clone https://github.com/tada/pljava.git
-RUN /usr/bin/apt-get source postgresql-${PG_MAJOR}-pljava
+# RUN /usr/bin/apt-get source postgresql-${PG_MAJOR}-pljava
 
 # change to source directory
 WORKDIR /usr/local/src/pljava
