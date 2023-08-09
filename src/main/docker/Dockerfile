@@ -99,11 +99,14 @@ RUN /usr/bin/apt-get install -y \
 # clean up package repo
 RUN /usr/bin/apt-get autoclean && /usr/bin/apt-get autoremove
 
-# download pljava source
+# download source for both pl/java and corresponding deb package
+# the latter allows us to build a new deb package with the local changes
+WORKDIR /usr/local/src
 RUN /usr/bin/git clone https://github.com/tada/pljava.git
+RUN /usr/bin/apt-get source postgresql-${PG_MAJOR}-pljava
 
 # change to source directory
-WORKDIR pljava
+WORKDIR /usr/local/src/pljava
 
 # check out specific version
 RUN git checkout ${PLJAVA_VERSION}

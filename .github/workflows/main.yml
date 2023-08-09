@@ -3,7 +3,7 @@ name: Docker PostgreSQL pl/java CI
 on:
   push:
     branches:
-      - 'add-pljava-dev-1'
+      - 'main'
   schedule:
     - cron: '15 5 * * 1'
 
