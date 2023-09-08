@@ -17,31 +17,31 @@
       - '15.4'
       - '15'
       - 'latest'
+      # '16rc1-bookworm'
+      # '16rc1-bullseye'
+      # '16rc1'
 
 #
 # Disable this block for now...
 #
-- name: Get list of postgresql tags
-  vars:
-    repo: '{{ postgres_name }}'
-  ansible.builtin.include_tasks: list-tags.yml
-  when: false
+# name: Get list of postgresql tags
+# vars:
+#   repo: '{{ postgres_name }}'
+# ansible.builtin.include_tasks: list-tags.yml
 
-- name: Set facts (postgres_tags)
-  ansible.builtin.set_fact:
-    postgres_tags: '{{ full_tags }}'
-    postgres_latest_major_tag: '{{ latest_major_tag }}'
-  when: false
+# name: Set facts (postgres_tags)
+#  ansible.builtin.set_fact:
+#    postgres_tags: '{{ full_tags }}'
+#    postgres_latest_major_tag: '{{ latest_major_tag }}'
 
-- name: Build docker images
-  ansible.builtin.include_tasks: build-images.yml
-  loop: '{{ tags }}'
-  loop_control:
-    loop_var: pg_version
-  when:
-    - tags is defined
-    - tags[0] is defined
-    - false
+# name: Build docker images
+# ansible.builtin.include_tasks: build-images.yml
+# loop: '{{ tags }}'
+# loop_control:
+#   loop_var: pg_version
+# when:
+#   - tags is defined
+#   - tags[0] is defined
 
 #
 # Do this instead
@@ -68,10 +68,10 @@
     msg: Unable to log into Docker Hub
 
 - name: Push docker images to docker hub
+  vars:
+    tag: '{{ item }}'
   ansible.builtin.include_tasks: push-images.yml
   loop: '{{ tags }}'
-  loop_control:
-    loop_var: pg_version
   when:
     - tags is defined
     - tags[0] is defined
