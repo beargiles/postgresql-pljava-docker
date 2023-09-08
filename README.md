@@ -1,68 +1,66 @@
-# What is PL/Java?
+# What are PGXS, PGXN and PL/Java? 
 
-[PL/Java](https://github.com/tada/pljava/wiki/) is a PostgreSQL extension that allows us to
+## Introduction
 
-- write stored procedures in java
-- make custom static methods visible within PostgreSQL
+PostgreSQL has rich support for **server** extensions. See
+[Chapter 38: Extending SQL](https://www.postgresql.org/docs/15/extend.html).
 
-The latter allows us to create user-defined functions (UDF) and user-defined types (UDT).
-There is also limited support for foreign data wrappers (FDW).
+These extensions are typically used to support:
 
-I wrote a series of articles on how to use PL/Java back in 2011.
+- new user-defined functions (UDF) [Chapter 38.3: User-Defined Functions](https://www.postgresql.org/docs/15/xfunc.html)
+- new user-defined types (UDT) [Chapter 38.13: User-Defined Types](https://www.postgresql.org/docs/15/xtypes.html)
+- new procedural languages [Chapter 58: Writing a Procedural Language Handler](https://www.postgresql.org/docs/15/plhandler.html)
+- new foreign data wrappers (FDW) [Chapter 59: Writing a Foreign Data Wrapper](https://www.postgresql.org/docs/15/fdwhandler.html)
 
-- [Introduction to PostgeSQL PL/java, part 1](https://invariantproperties.com/?p=549) (stored procedures)
-- [Introduction to PostgeSQL PL/java, part 2: Working with Lists](https://invariantproperties.com/?p=547)
-- [Introduction to PostgeSQL PL/java, part 3: Triggers](https://invariantproperties.com/?p=572)
-- [Introduction to PostgeSQL PL/java, part 4: User Defined Types](https://invariantproperties.com/?p=590)
-- [Introduction to PostgeSQL PL/java, part 5: Operations and Indexes](https://invariantproperties.com/?p=614)
+but there's really no limit to what can be done, for better or worse.
 
-This extension creates a new JVM for each database connection. These docker images are configured
-(per [PL/Java VM option recommendations](https://tada.github.io/pljava/install/vmoptions.html)) for
-improved performance albeit at the cost of making it impossible to attach to a running instance with
-a debugger.
+Two widely used extensions that demonstrate this additional functionality are:
 
-We can get an additional performance boost by pre-compiling the java classes to native libraries
-using the Java Ahead-of-Time Compiler (`jaotc`). The PL/Java documentation refers to
-[Quicker Clojure startup with AppCDS and AOT](https://web.archive.org/web/20191022103258/http://blog.gilliard.lol/2017/10/04/AppCDS-and-Clojure.html)
-for an example of this.
+- [PostGIS](https://postgis.net/)
+- [PGAudit](https://www.pgaudit.org/)
 
-# What is in this docker image?
+This repository provides three new sets of docker images:
 
-This docker image extends the official [Postgres docker hub image](https://hub.docker.com/_/postgres)
-extended to include the [pljava](https://github.com/tada/pljava/wiki) procedural language. The image
-also installs pgTAP and pgxnclient.
+- postgres-pgxnclient
+- postgres-pljava
+- postgres-pljava-dev
 
-## How often is us updated?
+### CI/CD (GitHub Actions)
 
-The CI/CD will check for new upstream docker images once a week, and will rebuild and redeploy
-docker images as required.
+I plan to use GitHub actions to periodically poll the official PostgreSQL images and build new images
+as they became available but I've had some problems getting the logic working right. So for now I've
+temporarily taken a step back and will only perform a build after pushing an update to this repo.
 
-Note: the CI/CD does not yet have the ability to tag images with their minor release - you'll
-only see the major version number even when the image is updated. I know how to fix this... but
-hit the 'max pulls' limit on github while refining it so it will only rebuild fairly recent
-images.
+## Managing new extensions
 
-## What is pgTAP?
+Extensions must be properly packaged before they can be used. See
+[Chapter 38.17: Packaging Related Objects into an Extension](https://www.postgresql.org/docs/15/extend-extensions.html).
+PostgreSQL recommends the use of [PGXS](https://www.postgresql.org/docs/15/extend-pgxs.html) for this.
 
-[pgTAP](https://pgtap.org/) provides a [TAP](https://testanything.org/) mechanism for PostgreSQL
-unit testing. It allows us to run tests in the database itself. It's useful when writing tests
-for stored procedures - and **very** useful when writing tests for java-based user-defined
-functions (UDF) and user-defined types (UDT).
+[PostgreSQL Extension Network (PGXN)](https://pgxn.org/) is a site that tracks published extensions
+that use PGXS. It provides a [pgxn-client](https://github.com/pgxn/pgxnclient) that provides a good
+abstraction layer over PGXS - it provides a baseline implementation of the functionality required
+by most extensions and reduces the need for individual developers to track all changes to the underlying
+PGXS infrastructure.
 
-## What is PGXN and PGXS?
+[PL/Java](https://github.com/tada/pljava/wiki) is just one of the procedural languages listed at PGXN.
 
-PGXN is the [**P**ost**g**reSQL E**x**tension **N**etwork](https://wiki.postgresql.org/wiki/PGXN).
-It provides a convenient way to find and manage PostgreSQL extensions. It should be checked before
-doing substantial work in PL/Java - there's no need to write new code if there's already a decent
-extension.
+Many of the extensions available at PGXN are procedural languages, e.g., PL/Java.
 
-[PGXS](https://wiki.postgresql.org/wiki/Building_and_Installing_PostgreSQL_Extension_Modules) is
-used to build and register PGXN projects.
+# Extensions available at the official PostgreSQL repository
 
-## Are there any other prepackaged extensions?
+PostgreSQL maintains an official package repository with the latest releases. For instance for Ubuntu
+you should add this to your `/etc/apt/sources.list` file:
 
-Yes - check the official [PostgreSQL 'apt' repository](https://wiki.postgresql.org/wiki/Apt).
-Some interesting projects are:
+```
+# keyring: from 'apt.postgresql.org.gpg'
+deb [arch=amd64 signed-by=/usr/share/keyrings/papt.postgresql.org.gpg] http://apt.postgresql.org/pub/repos/apt jammy-pgdg main
+```
+
+with the specified keyring downloaded and added to your system.
+
+A large number of extensions have already been packaged for your system - you usually do not need
+to take any additional steps beyond installing the respective package.
 
 - pg-activity - Realtime PostgreSQL database server monitoring tool
 - pg-cloudconfig - Set optimized defaults for PostgreSQL in virtual environments
@@ -71,7 +69,7 @@ Some interesting projects are:
 - pg-rational
 - pg-snakeoil
 - pgagent - job scheduling engine for PostgreSQL
-- pgaudit 
+- pgaudit
 - pgcluu - PostgreSQL performance monitoring and auditing tool
 - pgmemcache
 - pgsphere
@@ -82,69 +80,163 @@ Some interesting projects are:
 - postgresql-pllua - PostgreSQL extension for LUA
 - postgresql-plsh - PostgreSQL extension for shell scripts
 
-Debian packages
+The debian packages (bookworm and PostgreSQL repo) are
 
-- postgresql-14-asn1oid - ASN.1 OID data type for PostgreSQL
-- postgresql-14-extra-window-functions - Extra Window Functions for PostgreSQL
-- postgresql-14-first-last-agg - PostgreSQL extension providing first and last aggregate functions
-- postgresql-14-hll - HyperLogLog extension for PostgreSQL
-- postgresql-14-hypopg - PostgreSQL extension adding support for hypothetical indexes.
-- postgresql-14-icu-ext - PostgreSQL extension exposing functionality from the ICU library
-- postgresql-14-omnidb - PostgreSQL PL/pgSQL debugger extension for OmniDB
-- postgresql-14-pgpcre - Perl Compatible Regular Expressions (PCRE) extension for PostgreSQL
-- postgresql-14-pg-qualstats - PostgreSQL extension to gather statistics about predicates.
-- postgresql-14-pg-stat-kcache - PostgreSQL extension to gather per-query kernel statistics.
-- postgresql-14-pg-track-settings - PostgreSQL extension tracking of configuration settings
-- postgresql-14-plpgsql-check - plpgsql check extension for PostgreSQL
-- postgresql-14-pointcloud - PostgreSQL extension for storing point cloud (LIDAR) data
-- postgresql-14-powa - PostgreSQL Workload Analyzer -- PostgreSQL 14 extension
-- postgresql-14-q3c - PostgreSQL 14 extension used for indexing the sky
-- postgresql-14-similarity - PostgreSQL similarity functions extension
+- postgresql-15-asn1oid - ASN.1 OID data type for PostgreSQL
+- postgresql-15-auto-failover - Postgres high availability support
+- postgresql-15-bgw-replstatus - report whether PostgreSQL node is master or standby
+- postgresql-15-credcheck - PostgreSQL username/password checks
+- postgresql-15-cron - Run periodic jobs in PostgreSQL
+- postgresql-15-debversion - Debian version number type for PostgreSQL
+- postgresql-15-decoderbufs - logical decoder output plugin to deliver data as Protocol Buffers
+- postgresql-15-dirtyread - Read dead but unvacuumed tuples from a PostgreSQL relation
+- postgresql-15-extra-window-functions - Extra Window Functions for PostgreSQL
+- postgresql-15-first-last-agg - PostgreSQL extension providing first and last aggregate functions
+- postgresql-15-hll - HyperLogLog extension for PostgreSQL
+- postgresql-15-hypopg - PostgreSQL extension adding support for hypothetical indexes.
+- postgresql-15-icu-ext - PostgreSQL extension exposing functionality from the ICU library
+- postgresql-15-ip4r - IPv4 and IPv6 types for PostgreSQL 15
+- postgresql-15-jsquery - PostgreSQL JSON query language with GIN indexing support
+- postgresql-15-londiste-sql - SQL infrastructure for Londiste
+- postgresql-15-mimeo - specialized, per-table replication between PostgreSQL instances
+- postgresql-15-mysql-fdw - Postgres 15 Foreign Data Wrapper for MySQL
+- postgresql-15-numeral - numeral datatypes for PostgreSQL
+- postgresql-15-ogr-fdw - PostgreSQL foreign data wrapper for OGR
+- postgresql-15-omnidb - PostgreSQL PL/pgSQL debugger extension for OmniDB
+- postgresql-15-oracle-fdw - PostgreSQL Foreign Data Wrapper for Oracle
+- postgresql-15-orafce - Oracle support functions for PostgreSQL 15
+- postgresql-15-partman - PostgreSQL Partition Manager
+- postgresql-15-periods - PERIODs and SYSTEM VERSIONING for PostgreSQL
+- postgresql-15-pgauditlogtofile - PostgreSQL pgAudit Add-On to redirect audit logs
+- postgresql-15-pgaudit - PostgreSQL Audit Extension
+- postgresql-15-pg-catcheck - Postgres system catalog checker
+- postgresql-15-pg-checksums - Activate/deactivate/verify PostgreSQL data checksums
+- postgresql-15-pgextwlist - PostgreSQL Extension Whitelisting
+- postgresql-15-pg-fact-loader - Build fact tables asynchronously with Postgres
+- postgresql-15-pg-failover-slots - High-availability support for PostgreSQL logical replication
+- postgresql-15-pgfincore - set of PostgreSQL functions to manage blocks in memory
+- postgresql-15-pgl-ddl-deploy - Transparent DDL replication for PostgreSQL
+- postgresql-15-pglogical - Logical Replication Extension for PostgreSQL
+- postgresql-15-pglogical-ticker - Have time-based replication delay for pglogical
+- postgresql-15-pgmemcache - PostgreSQL interface to memcached
+- postgresql-15-pgmp - arbitrary precision integers and rationals for PostgreSQL 15
+- postgresql-15-pgpcre - Perl Compatible Regular Expressions (PCRE) extension for PostgreSQL
+- postgresql-15-pgpool2 - connection pool server and replication proxy for PostgreSQL - modules
+- postgresql-15-pgq3 - Generic queue for PostgreSQL
+- postgresql-15-pgq-node - Cascaded queueing on top of PgQ
+- postgresql-15-pg-qualstats - PostgreSQL extension to gather statistics about predicates.
+- postgresql-15-pgrouting - Routing functionality support for PostgreSQL/PostGIS
+- postgresql-15-pgrouting-scripts - Routing functionality support for PostgreSQL/PostGIS - SQL scripts
+- postgresql-15-pgsphere - Spherical data types for PostgreSQL
+- postgresql-15-pg-stat-kcache - PostgreSQL extension to gather per-query kernel statistics.
+- postgresql-15-pgtap - Unit testing framework extension for PostgreSQL 15
+- postgresql-15-pg-track-settings - PostgreSQL extension tracking of configuration settings
+- postgresql-15-pgvector - Open-source vector similarity search for Postgres
+- postgresql-15-pg-wait-sampling - Extension providing statistics about PostgreSQL wait events
+- postgresql-15-pldebugger - PostgreSQL pl/pgsql Debugger API
+- postgresql-15-pljava - Java procedural language for PostgreSQL 15
+- postgresql-15-pllua - Lua procedural language for PostgreSQL 15
+- postgresql-15-plpgsql-check - plpgsql_check extension for PostgreSQL
+- postgresql-15-plprofiler - PostgreSQL PL/pgSQL functions performance profiler
+- postgresql-15-plproxy - database partitioning system for PostgreSQL 15
+- postgresql-15-plr - Procedural language interface between PostgreSQL and R
+- postgresql-15-plsh - PL/sh procedural language for PostgreSQL 15
+- postgresql-15-pointcloud - PostgreSQL extension for storing point cloud (LIDAR) data
+- postgresql-15-postgis-3 - Geographic objects support for PostgreSQL 15
+- postgresql-15-postgis-3-scripts - Geographic objects support for PostgreSQL 15 -- SQL scripts
+- postgresql-15-powa - PostgreSQL Workload Analyzer -- PostgreSQL 15 extension
+- postgresql-15-prefix - Prefix Range module for PostgreSQL
+- postgresql-15-preprepare - pre prepare your PostgreSQL statements server side
+- postgresql-15-prioritize - Get and set the nice priorities of PostgreSQL backends
+- postgresql-15-q3c - PostgreSQL 15 extension used for indexing the sky
+- postgresql-15-rational - Precise fractional arithmetic for PostgreSQL
+- postgresql-15-rdkit - Cheminformatics and machine-learning software (PostgreSQL Cartridge)
+- postgresql-15-repack - reorganize tables in PostgreSQL databases with minimal locks
+- postgresql-15-repmgr - replication manager for PostgreSQL 15
+- postgresql-15-rum - PostgreSQL RUM access method
+- postgresql-15-semver - Semantic version number type for PostgreSQL
+- postgresql-15-set-user - PostgreSQL privilege escalation with enhanced logging and control
+- postgresql-15-show-plans - Show query plans of currently running PostgreSQL statements
+- postgresql-15-similarity - PostgreSQL similarity functions extension
+- postgresql-15-slony1-2 - replication system for PostgreSQL: PostgreSQL 15 server plug-in
+- postgresql-15-snakeoil - PostgreSQL anti-virus scanner based on ClamAV
+- postgresql-15-squeeze - PostgreSQL extension for automatic bloat cleanup
+- postgresql-15-tablelog - log changes on tables and restore tables to point in time
+- postgresql-15-tdigest - t-digest algorithm for on-line accumulation of rank-based statistics
+- postgresql-15-tds-fdw - PostgreSQL foreign data wrapper for TDS databases
+- postgresql-15-toastinfo - Show storage structure of varlena datatypes in PostgreSQL
+- postgresql-15-unit - SI Units for PostgreSQL
+- postgresql-15-wal2json - PostgreSQL logical decoding JSON output plugin
 
-# How does it work?
+# Dockerization
 
-The Dockerfile installs the official pl/java package available at the
-[PostgreSQL apt repo](https://apt.postgresql.org/pub/repos/apt/pool/main/p/postgresql-pljava/).
-The Dockerfile also installs [pgTAP](https://pgtap.org/) (for unit testing) and
-[pgxnclient](https://pgxn.github.io/pgxnclient/) (PostGresql Extension Network) since anyone
-writing code in pl/java will definitely want to test it and is likely to be interested in
-additional extensions.
+The PostgreSQL's official docker images are available at [https://hub.docker.com/_/postgres](https://hub.docker.com/_/postgres).
+I highly recommend them, especially if you're using [TestContainers](https://testcontainers.com/) since the
+Postgres module knows about this repo. (Warning: the module defaults to a very old version of the database.)
 
-Finally the Dockerfile sets up a simple script that creates the 'java' extension and
-grants public access to 'java' (but not javau).
+This approach breaks down somewhat if your application needs one or more extensions. You want your CI/CD
+pipeline to start with the official PostgreSQL image, install known extensions, and then proceed to the next
+steps. The second step might be a challenge, esp. if you aren't aware of the official repository.
 
-# Usage
+This repository contains a multistage Docker build that demonstrates how to do this.
 
-See the [official PostgreSQL image](https://hub.docker.com/_/postgres) page. This image does nothing
-but preinstall pl/java, pgTAP, and pgxnclient.
+## First image: PGXN-Client
 
-If you need the minimal viable command use
+The first docker image, `pgxn-client`, installs the PGXN client. It is used as the basis for other
+docker images.
 
+It also installs [pgTAP](https://pgtap.org/). It is a [TAP](https://testanything.org/) implementation
+for PostgreSQL server unit testing. These tests are run in the database itself, not a client, so it
+is able to provide incredibly useful information when writing tests for PGXS-based functionality.
+
+## Second image: PLJava
+
+The second docker image, `pljava`, installs the PL/Java extension.
+
+It also installs OpenJDK.
+
+**Important notes**
+- PL/Java is limited to static methods contained within uploaded jars - it does not allow you to use java as a procedural language.
+- (iirc) PL/Java uses a separate JVM for each client connection.
+
+### TestContainers
+
+If you're using TestContainers you'll need to take an additional step or two. My tests use
+
+```java
+   PostgreSQLContainer getContainer() {
+        DockerImageName imageName = DockerImageName.parse("beargiles/postgres-pljava:15.4").asCompatibleSubstituteFor("postgres");
+        PostgreSQLContainer db = new PostgreSQLContainer(ImageName);
+        db.withImagePullPolicy((s) -> false);
+        return db;
+    }
 ```
-$ docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=password beargiles/pljava
+
+You'll definitely need the `asCompatibleSubstituteFor()` command.
+
+You might not need the `withImagePullPolicy()` line - I might only need it since I've been doing local development
+of these docker images.
+
+## Third image: PLJava-dev
+
+The final docker image, `pljava-dev`, installs a dev environment capable of rebuilding the
+Debian packages. In fact the Dockerfile does that as a smoke test.
+
+You can rebuild the packages yourself with the following steps:
+
+```shell
+$ cd /usr/local/src
+$ apt-get source postgresql-15-pljava
+$ cd postgresql-pljava-1.6.4
+$ dpkg-buildpackage --build=binary --no-sign
 ```
 
-# Extensions
+(Magic values correspond to 'latest' release as I write this.)
 
-A natural extension to this docker image is one that adds a `/docker-entrypoint-initdb.d` script
-that defines pl/java-based stored procedures and any UDF/UDT that uses them.
+This will create a number of `.deb` files under `/usr/local/src`.
 
-## Custom Java classes
-
-It is possible to add your own java jars to the classpath and make the classes and methods available
-to the system. This is particularly useful when you wish to create opaque user-defined functions (UDF)
-user-defined types (UDT).
-
-In this case you must add `/usr/share/postgresql/14/pljava/pljava-api-1.6.4.jar` to your claspath
-and follow the restrictions listed on the [pl/java wiki](https://github.com/tada/pljava/wiki).
- E.g., only static methods will be visible.
-
-The Dockerfile will then need to be modified to:
-
-* download and build the java code
-* add a `/docker-entrypoint-initdb.d` script using 'pgxs' to install the jar(s)
-
-At this point the custom jars will be available for use by any pl/java stored procedure.
+It should go without saying that you should update the changelog file and version to avoid
+any confusion with the official packages.
 
 # Alternatives
 
@@ -154,4 +246,3 @@ includes two additional docker images.
 # Source code
 
 The source code is located at [github.com/beargiles/postgresql-pljava-docker](https://github.com/beargiles/postgresql-pljava-docker).
-

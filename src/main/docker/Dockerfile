@@ -1,11 +1,10 @@
-# syntax=docker/dockerfile:1
-
 #
 # Create image that adds the PostgreSQL extension development tools
 # (pgxnclient and pgtap)
 #
-ARG PG_VERSION=15
-FROM postgres:${PG_VERSION} AS pgxnclient
+ARG PG_VERSION=15.3
+ARG RELEASE=bookworm
+FROM postgres:${PG_VERSION}-${RELEASE} AS pgxnclient
 
 LABEL maintainer="Bear Giles <bgiles@coyotesong.com>"
 LABEL org.opencontainers.image.authors="bgiles@coyotesong.com"
@@ -21,19 +20,20 @@ EXPOSE 5432
 VOLUME /var/log/postgresql/
 VOLUME /docker-entrypoint-initdb.d/
 
+# add apt source repository (note: error with /usr/bin/sed)
+RUN sed -e 's/^deb /deb-src /' </etc/apt/sources.list.d/pgdg.list >/etc/apt/sources.list.d/pgdg-src.list
+
 # DO NOT do a general update - that would also update the postgresql version
+# Unfortunately that also means we can't pull debian pljava source later
 # RUN /usr/bin/apt-get upgrade -y
 
 # Update apt database then install pgtap, pgxnclient, plus a few packages
 # useful for manual tasks later.
-RUN /usr/bin/apt-get update && \
-    /usr/bin/apt-get install -y \
+RUN /usr/bin/apt-get update && /usr/bin/apt-get install -y \
        pgxnclient \
        postgresql-${PG_MAJOR}-pgtap \
        apt-utils \
        whiptail
-
-ONBUILD RUN /usr/bin/apt-get update
 
 # Remove cached files, unnecessary packages, etc.
 RUN /usr/bin/apt-get autoclean && /usr/bin/apt-get autoremove
@@ -78,43 +78,36 @@ LABEL org.opencontainers.image.authors="bgiles@coyotesong.com"
 LABEL org.opencontainers.image.description="PostgreSQL with pl/java build environment preinstalled (Debian)"
 LABEL org.opencontainers.image.source="https://github.com/beargiles/postgresql-pljava-docker"
 
+ARG PLJAVA_VERSION=1.6.4
 ARG PG_MAJOR=15
-ARG PLJAVA_VERSION=REL1_6_STABLE
 
-# ARG JAVA_VERSION=11  # this isn't always visible...
+# ARG JAVA_VERSION=11
 ARG JAVA_VERSION=17    # from inspecting upstream docker image
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# add apt source repository
-COPY pgdg-keyring.gpg /usr/share/keyrings/pgdg-keyring.gpg
-COPY pgdg-src.list /etc/apt/sources.list.d/pgdg-src.list
-
 # install git, java, C compiler, and libraries
 RUN /usr/bin/apt-get update && \
     /usr/bin/apt-get install -y \
-      git \
-      openjdk-${JAVA_VERSION}-jdk \
-      maven \
+      debhelper-compat \
+      default-jdk-headless \
+      dpkg-dev \
       gcc \
+      git \
       libecpg-dev \
       libkrb5-dev \
+      maven \
+      openjdk-${JAVA_VERSION}-jdk \
+      postgresql-all \
       postgresql-server-dev-${PG_MAJOR}
 
-# clean up package repo
-RUN /usr/bin/apt-get autoclean && /usr/bin/apt-get autoremove
-
-# download source for both pl/java and corresponding deb package
+# download source for pl/java
 # the latter allows us to build a new deb package with the local changes
 WORKDIR /usr/local/src
-RUN /usr/bin/git clone https://github.com/tada/pljava.git
-# RUN /usr/bin/apt-get source postgresql-${PG_MAJOR}-pljava
 
-# change to source directory
-WORKDIR /usr/local/src/pljava
+RUN /usr/bin/apt-get source postgresql-${PG_MAJOR}-pljava
 
-# check out specific version
-RUN git checkout ${PLJAVA_VERSION}
+WORKDIR /usr/local/src/postgresql-pljava-${PLJAVA_VERSION}
 
-# build
-RUN mvn install
+RUN /usr/bin/dpkg-buildpackage --build=binary --no-sign
+

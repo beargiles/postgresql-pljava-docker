@@ -1,22 +1,37 @@
 ---
 # tasks file for pljava_docker
 
-
 # bit of a cheat for now...
 - name: Create set of tags to build
   ansible.builtin.set_fact:
     tags:
-      - '15.2'
+      - '14.9-bookworm'
+      - '14-bookworm'
+      - '14.9-bullseye'
+      - '14-bullseye'
+      - '14'
+      - '15.4-bookworm'
+      - '15-bookworm'
+      - '15.4-bullseye'
+      - '15-bullseye'
+      - '15.4'
+      - '15'
+      - 'latest'
 
+#
+# Disable this block for now...
+#
 - name: Get list of postgresql tags
   vars:
     repo: '{{ postgres_name }}'
   ansible.builtin.include_tasks: list-tags.yml
+  when: false
 
 - name: Set facts (postgres_tags)
   ansible.builtin.set_fact:
     postgres_tags: '{{ full_tags }}'
     postgres_latest_major_tag: '{{ latest_major_tag }}'
+  when: false
 
 - name: Build docker images
   ansible.builtin.include_tasks: build-images.yml
@@ -26,7 +41,17 @@
   when:
     - tags is defined
     - tags[0] is defined
+    - false
 
+#
+# Do this instead
+#
+- name: Build all packages
+  ansible.buildin.shell: 'src/main/docker/buildall.sh'
+
+#
+# Log into docker hub
+#
 - name: Log into docker hub
   community.docker.docker_login:
     username: "{{ lookup('ansible.builtin.env', 'DOCKERHUB_USERNAME') }}"
