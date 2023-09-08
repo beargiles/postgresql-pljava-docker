@@ -53,3 +53,21 @@ seed_tags:
   - '15.1'
   # '15.2'
   # '15.3'
+
+# since they aren't being pulled in by main/push-images...
+actual_versions:
+  - '14.9-bookworm'
+  - '14-bookworm'
+  - '14.9-bullseye'
+  - '14-bullseye'
+  - '14'
+  - '15.4-bookworm'
+  - '15-bookworm'
+  - '15.4-bullseye'
+  - '15-bullseye'
+  - '15.4'
+  - '15'
+  - 'latest'
+  # '16rc1-bookworm'
+  # '16rc1-bullseye'
+  # '16rc1'

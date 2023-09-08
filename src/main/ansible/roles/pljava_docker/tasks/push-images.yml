@@ -5,59 +5,22 @@
 # ------------------------------------------------------
 #
 # Requires:
-#  - pg_version - full version of Postgres version
-#
-# Provides:
-#  - pushes docker images to githubs.
+#  - version - version to push
 #
 # ------------------------------------------------------
 #
 # Push local images to docker hub
 #
 ---
-- name: Set facts (pg_major)
-  ansible.builtin.set_fact:
-    pg_major: "{{ pg_version | regex_replace('^([0-9]+).*$', '\\1') }}"
 
-- name: 'Push docker image (version: {{ pg_version }})'
+- name: 'Push docker images for ({{ version }})'
   community.docker.docker_image:
-    name: '{{ name }}:{{ pg_version }}'
-    repository: '{{ name }}:{{ pg_version }}'
-    force_tag: true
+    name: '{{ item }}:{{ version }}'
+    repository: '{{ item }}:{{ version }}'
+    force_version: true
     push: true
     source: local
   loop:
     - '{{ pgxnclient_name }}'
     - '{{ pljava_name }}'
     - '{{ pljava_dev_name }}'
-  loop_control:
-    loop_var: name
-
-- name: 'Push docker image (major version: {{ pg_major }})'
-  community.docker.docker_image:
-    name: '{{ name }}:{{ pg_version }}'
-    repository: '{{ name }}:{{ pg_major }}'
-    force_tag: true
-    push: true
-    source: local
-  loop:
-    - '{{ pgxnclient_name }}'
-    - '{{ pljava_name }}'
-    - '{{ pljava_dev_name }}'
-  loop_control:
-    loop_var: name
-
-- name: Push docker image (latest)
-  community.docker.docker_image:
-    name: '{{ name }}:{{ pg_version }}'
-    repository: '{{ name }}:latest'
-    force_tag: true
-    push: true
-    source: local
-  loop:
-    - '{{ pgxnclient_name }}'
-    - '{{ pljava_name }}'
-    - '{{ pljava_dev_name }}'
-  loop_control:
-    loop_var: name
-  when: pg_major == postgres_latest_major_tag
