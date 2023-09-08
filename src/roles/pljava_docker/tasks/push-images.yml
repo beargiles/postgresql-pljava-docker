@@ -5,7 +5,7 @@
 # ------------------------------------------------------
 #
 # Requires:
-#  - tag - tag to push
+#  - version - version to push
 #
 # ------------------------------------------------------
 #
@@ -13,26 +13,14 @@
 #
 ---
 
-- name: 'Push docker image for pgxn-client ({{ tag }})'
+- name: 'Push docker images for ({{ version }})'
   community.docker.docker_image:
-    name: '{{ pgxnclient_name}}:{{ tag }}'
-    repository: '{{ pgxnclient_name }}:{{ tag }}'
-    force_tag: true
+    name: '{{ item }}:{{ version }}'
+    repository: '{{ item }}:{{ version }}'
+    force_version: true
     push: true
     source: local
-
-- name: 'Push docker image for pl/java'
-  community.docker.docker_image:
-    name: '{{ pljava_name}}:{{ tag }}'
-    repository: '{{ pljava_name }}:{{ tag }}'
-    force_tag: true
-    push: true
-    source: local
-
-- name: 'Push docker image for pl/java development'
-  community.docker.docker_image:
-    name: '{{ pljava_name}}:{{ tag }}'
-    repository: '{{ pljava_dev_name }}:{{ tag }}'
-    force_tag: true
-    push: true
-    source: local
+  loop:
+    - '{{ pgxnclient_name }}'
+    - '{{ pljava_name }}'
+    - '{{ pljava_dev_name }}'
