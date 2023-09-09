@@ -1,6 +1,17 @@
+#
+# Build most images. This script does not build pljava-dev since it
+# currently makes an unsafe assumption. (The name of the source directory
+# includes the pl/java version.)
+#
 ---
 - hosts: localhost
   tasks:
-    - name: Build and deploy docker images.
+    - name: Build and deploy pgxnclient and pljava docker images.
+      vars:
+        targets:
+          - name: 'beargiles/postgres-pljava'
+            target: pljava
+          - name: 'beargiles/postgres-pgxnclient'
+            target: pgxnclient
       ansible.builtin.include_role:
         name: pljava_docker

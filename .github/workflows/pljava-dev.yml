@@ -5,7 +5,7 @@ on:
     branches:
       - 'main'
   schedule:
-    - cron: '15 5 * * 1'
+    - cron: '30 5 * * 1'
 
 defaults:
   run:
@@ -14,7 +14,7 @@ defaults:
 jobs:
 
   build-and-push-docker-images:
-    name: Build and push docker images for PostgreSQL + extensions
+    name: Build and push docker images for PostgreSQL + extensions (PL/Java Dev only)
 
     runs-on: ubuntu-22.04
 
@@ -42,4 +42,4 @@ jobs:
         run: /usr/bin/ansible-galaxy install -r src/main/ansible/roles/requirements.yml
 
       - name: Build and push docker images
-        run: /usr/bin/ansible-playbook src/main/ansible/build.yml
+        run: /usr/bin/ansible-playbook src/main/ansible/build-pljava-dev.yml

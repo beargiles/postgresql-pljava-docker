@@ -1,0 +1,37 @@
+# ------------------------------------------------------
+#
+# Push local images to dockerhub
+#
+# ------------------------------------------------------
+#
+# Requires:
+#  - pg_version - version to push (multiple debian releases)
+#
+# ------------------------------------------------------
+#
+# Push local images to docker hub
+#
+---
+- name: 'Push docker images for latest debian release ({{ pg_version }})'
+  community.docker.docker_image:
+    name: '{{ push5.name }}:{{ pg_version }}-{{ debian_latest_release }}'
+    repository: '{{ push5.name }}:{{ pg_version }}'
+    force_tag: true
+    push: true
+    source: local
+  loop: '{{ targets }}'
+  loop_control:
+    loop_var: push5
+
+- name: 'Push docker images for latest debian release'
+  vars:
+    pg_major: "{{ pg_version | regex_replace('^([0-9]+).*$', '\\1') }}"
+  community.docker.docker_image:
+    name: '{{ push6.name }}:{{ pg_version }}'
+    repository: '{{ push6.name }}:{{ pg_major }}'
+    force_tag: true
+    push: true
+    source: local
+  loop: '{{ targets }}'
+  loop_control:
+    loop_var: push6

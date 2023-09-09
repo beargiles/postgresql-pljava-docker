@@ -1,0 +1,23 @@
+# ------------------------------------------------------
+#
+# Build and tag local images by pg version
+#
+# ------------------------------------------------------
+#
+# Requires:
+#  - pg_version - full version of Postgres version
+#
+# Produces:
+#  - local docker image(s).
+#
+---
+- name: 'Build docker images for ({{ pg_version }})'
+  vars:
+    debian_release: '{{ debian_release_build }}'
+  ansible.builtin.include_tasks: actual-build-images.yml
+  loop: '{{ debian_releases }}'
+  loop_control:
+    loop_var: debian_release_build
+  when:
+    - debian_releases is defined
+    - debian_releases[0] is defined
