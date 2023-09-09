@@ -3,8 +3,8 @@
 # (pgxnclient and pgtap)
 #
 ARG PG_VERSION=15.3
-ARG RELEASE=bookworm
-FROM postgres:${PG_VERSION}-${RELEASE} AS pgxnclient
+ARG DEBIAN_RELEASE=bookworm
+FROM postgres:${PG_VERSION}-${DEBIAN_RELEASE} AS pgxnclient
 
 LABEL maintainer="Bear Giles <bgiles@coyotesong.com>"
 LABEL org.opencontainers.image.authors="bgiles@coyotesong.com"

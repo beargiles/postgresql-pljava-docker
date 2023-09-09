@@ -1,0 +1,15 @@
+#
+# Build postgres-pljava-dev image. This is done in a separate
+# CI/CD task since it will fail when the pl/java version is
+# bumped.
+#
+---
+- hosts: localhost
+  tasks:
+    - name: Build and deploy docker images.
+      vars:
+        targets:
+          - name: 'beargiles/postgres-pljava-dev'
+            target: pljavadev
+      ansible.builtin.include_role:
+        name: pljava_docker

@@ -1,0 +1,34 @@
+# ------------------------------------------------------
+#
+# Build and tag local images.
+#
+# ------------------------------------------------------
+#
+# Requires:
+#  - debian_release - Debian release (bookworm, bullseye)
+#  - pg_version - full version of Postgres version
+#
+# Provides:
+#  - local docker image(s).
+#
+---
+- name: 'Set facts ({{ pg_version }}-{{ debian_release }})'
+  ansible.builtin.set_fact:
+    pg_major: "{{ pg_version | regex_replace('^([0-9]+).*$', '\\1') }}"
+    tag: '{{ pg_version }}-{{ debian_release }}'
+
+- name: 'Build docker image {{ tag }}'
+  community.docker.docker_image:
+    name: '{{ build.name }}'
+    build:
+      path: ../docker
+      target: '{{ build.target }}'
+      args:
+        DEBIAN_RELEASE: '{{ debian_release }}'
+        POSTGRES_MAJOR: '{{ pg_major }}'
+        POSTGRES_VERSION: '{{ pg_version }}'
+    tag: '{{ tag }}'
+    source: build
+  loop: '{{ targets }}'
+  loop_control:
+    loop_var: build
