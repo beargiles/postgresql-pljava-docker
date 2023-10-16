@@ -2,7 +2,7 @@
 # Create image that adds the PostgreSQL extension development tools
 # (pgxnclient and pgtap)
 #
-ARG PG_VERSION=15.3
+ARG PG_VERSION=16.0
 ARG DEBIAN_RELEASE=bookworm
 FROM postgres:${PG_VERSION}-${DEBIAN_RELEASE} AS pgxnclient
 
@@ -11,7 +11,7 @@ LABEL org.opencontainers.image.authors="bgiles@coyotesong.com"
 LABEL org.opencontainers.image.source="https://github.com/coyotesong/postgresql-pgxnclient-docker"
 LABEL org.opencontainers.image.description="PostgreSQL with extension dev packages preinstalled (Debian)"
 
-ARG PG_MAJOR=15
+ARG PG_MAJOR=16
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -48,7 +48,7 @@ LABEL org.opencontainers.image.authors="bgiles@coyotesong.com"
 LABEL org.opencontainers.image.description="PostgreSQL with pl/java preinstalled (Debian)"
 LABEL org.opencontainers.image.source="https://github.com/beargiles/postgresql-pljava-docker"
 
-ARG PG_MAJOR=15
+ARG PG_MAJOR=16
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -78,8 +78,8 @@ LABEL org.opencontainers.image.authors="bgiles@coyotesong.com"
 LABEL org.opencontainers.image.description="PostgreSQL with pl/java build environment preinstalled (Debian)"
 LABEL org.opencontainers.image.source="https://github.com/beargiles/postgresql-pljava-docker"
 
-ARG PLJAVA_VERSION=1.6.4
-ARG PG_MAJOR=15
+ARG PLJAVA_VERSION=1.6.6
+ARG PG_MAJOR=16
 
 # ARG JAVA_VERSION=11
 ARG JAVA_VERSION=17    # from inspecting upstream docker image

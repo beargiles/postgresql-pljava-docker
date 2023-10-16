@@ -7,6 +7,7 @@
 # Requires:
 #  - debian_release - Debian release (bookworm, bullseye)
 #  - pg_version - full version of Postgres version
+#  - pljava_version - pl/java version (optional)
 #
 # Provides:
 #  - local docker image(s).
@@ -27,6 +28,7 @@
         DEBIAN_RELEASE: '{{ debian_release }}'
         POSTGRES_MAJOR: '{{ pg_major }}'
         POSTGRES_VERSION: '{{ pg_version }}'
+        PLJAVA_VERSION: '{{ pljava_version | default(omit) }}'
     tag: '{{ tag }}'
     source: build
   loop: '{{ targets }}'
