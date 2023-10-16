@@ -11,5 +11,6 @@
         targets:
           - name: 'beargiles/postgres-pljava-dev'
             target: pljavadev
+            pljava_version: 1.6.6
       ansible.builtin.include_role:
         name: pljava_docker
