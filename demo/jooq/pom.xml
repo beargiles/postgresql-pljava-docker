@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.coyotesong.examples</groupId>
+        <artifactId>pljava</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <groupId>com.coyotesong.examples.pljava</groupId>
+    <artifactId>jooq</artifactId>
+
+    <!--
+       - This module auto-generates the jOOQ code using a TestContainer instance
+       - and a set of "Flyway" configuration files. Flyway provides a clean way
+       - to manage database changes, and this package will generate the low-level
+       - jOOQ code that accesses the database.
+       -
+       - With a small change this module could auto-generate JPA/Hibernate code.
+       -
+       - It's also possible to generate the "model" classes from the database
+       - schema but that's not without some risk.
+       -
+       - We do NOT want to go the other way around - to go from our model to
+       - database schema - since it is much more difficult to manage database
+       - updates in this case. It might be manageable if the database model isn't
+       - too complex and/or shared with others but overall we're better off going
+       - from a managed schema to the glue logic than from java code to a schema.
+       -
+       - DATABASE EXTENSIONS (e.g., PL/Java)
+       -
+       - The 'flyway' scripts can easily install database extensions. The only
+       - requirement is that the extension is already downloaded and put in the
+       - standard location - we can't download extensions via flyway.
+       -->
+
+    <!-- see https://www.jooq.org/doc/3.18/manual/code-generation/codegen-configuration/ -->
+    <!-- see https://testcontainers.com/guides/working-with-jooq-flyway-using-testcontainers/ -->
+    <!-- see https://blog.jooq.org/using-testcontainers-to-generate-jooq-code/ -->
+
+    <name>Autogenerate jOOQ code</name>
+
+    <description>
+        Autogenerate jOOQ code. We could just as easily autogenerate JPA/hibernate
+        code, run integration tests, etc.
+    </description>
+
+    <properties>
+        <jooq.version>3.19.17</jooq.version>
+        <flyway.version>11.1.1</flyway.version>
+        <postgresql.jdbc.version>42.6.0</postgresql.jdbc.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq</artifactId>
+                <version>${jooq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-database-postgresql</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql-jdbc.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
+    <build/>
+
+    <profiles>
+        <profile>
+            <id>codegen</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <jooq.version>3.19.17</jooq.version>
+                <flyway.version>11.1.1</flyway.version>
+                <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
+                <testcontainers.version>1.20.4</testcontainers.version>
+                <postgresql.jdbc.version>42.6.0</postgresql.jdbc.version>
+
+                <jooq.target.packageName>${project.groupId}.persistence.jooq.generated</jooq.target.packageName>
+
+                <!-- note: flyway may not support the most recent database releases! -->
+                <db.container>postgres:16.6-bookworm</db.container>
+                <db.dbname>test</db.dbname>
+                <db.username>bob</db.username>
+                <db.password>password</db.password>
+            </properties>
+            <build>
+                <plugins>
+                    <!-- launch test container -->
+                    <plugin>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>groovy-maven-plugin</artifactId>
+                        <version>2.1.1</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.testcontainers</groupId>
+                                <artifactId>postgresql</artifactId>
+                                <version>${testcontainers.version}</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <id>start-database-testcontainer</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <source>
+                                        db = new org.testcontainers.containers.PostgreSQLContainer(
+                                                    org.testcontainers.utility.DockerImageName.parse("${db.container}").asCompatibleSubstituteFor("postgres"))
+                                                .withUsername("${db.username}")
+                                                .withDatabaseName("${db.dbname}")
+                                                .withPassword("${db.password}");
+
+                                        db.start();
+
+                                        // After you've started the container, collect its generated
+                                        // JDBC URL (which contains a random port)
+                                        project.properties.setProperty('db.url', db.getJdbcUrl());
+                                    </source>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- initialize database -->
+                    <plugin>
+                        <groupId>org.flywaydb</groupId>
+                        <artifactId>flyway-maven-plugin</artifactId>
+                        <version>${flyway.version}</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.flywaydb</groupId>
+                                <artifactId>flyway-database-postgresql</artifactId>
+                                <version>${flyway.version}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.postgresql</groupId>
+                                <artifactId>postgresql</artifactId>
+                                <version>${postgresql.jdbc.version}</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <id>initialize-database</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>migrate</goal>
+                                </goals>
+                                <configuration>
+                                    <url>${db.url}</url>
+                                    <user>${db.username}</user>
+                                    <password>${db.password}</password>
+                                    <verbose>true</verbose>
+                                    <locations>
+                                        <location>
+                                            filesystem:src/main/resources/db/migration
+                                        </location>
+                                    </locations>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- autogenerate jooq code -->
+                    <plugin>
+                        <groupId>org.jooq</groupId>
+                        <artifactId>jooq-codegen-maven</artifactId>
+                        <version>${jooq.version}</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.postgresql</groupId>
+                                <artifactId>postgresql</artifactId>
+                                <version>${postgresql.jdbc.version}</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <id>generate-jooq-sources</id>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                                <phase>generate-sources</phase>
+                                <configuration>
+                                    <jdbc>
+                                        <driver>org.postgresql.Driver</driver>
+                                        <url>${db.url}</url>
+                                        <user>${db.username}</user>
+                                        <password>${db.password}</password>
+                                    </jdbc>
+                                    <!-- or
+                                    <properties>
+                                        <property><key>user</key><value>{db-user}</value></property>
+                                        <property><key>password</key><value>{db-password}</value></property>
+                                    </properties>
+                                    -->
+                                    <generator>
+                                        <database>
+                                            <name>org.jooq.meta.postgres.PostgresDatabase</name>
+                                            <excludes>
+                                                deb_file_hashes
+                                            </excludes>
+                                            <inputCatalog/>
+                                            <inputSchema>public</inputSchema>
+                                        </database>
+                                        <target>
+                                            <packageName>${jooq.target.packageName}</packageName>
+                                            <directory>src/main/java</directory>
+                                        </target>
+                                    </generator>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Clean shutdown. Not really required but doesn't hurt -->
+                    <plugin>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>groovy-maven-plugin</artifactId>
+                        <version>2.1.1</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.testcontainers</groupId>
+                                <artifactId>postgresql</artifactId>
+                                <version>${testcontainers.version}</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <id>start-database-testcontainer</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <source>
+                                        db.stop();
+                                    </source>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

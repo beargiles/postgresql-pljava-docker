@@ -25,3 +25,6 @@ replay_pid*
 
 # editor
 .idea/
+target
+demo/model/target
+demo/jooq/target

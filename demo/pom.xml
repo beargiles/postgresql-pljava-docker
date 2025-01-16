@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.coyotesong.examples</groupId>
+    <artifactId>pljava</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>model</module>
+        <module>jooq</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- maven dependencies -->
+        <maven.version>3.9.0</maven.version> <!-- 3.6.3 on Ubuntu 22.04? -->
+        <maven-artifact-transfer.version>0.13.1</maven-artifact-transfer.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-dependency-tree-plugin.version>3.6.1</maven-dependency-tree-plugin.version>
+        <maven-failsafe-plugin.version>3.2.2</maven-failsafe-plugin.version>
+        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+        <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
+        <maven-reporting-api.version>3.1.1</maven-reporting-api.version>
+        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
+        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+        <error-prone.version>2.3.4</error-prone.version>
+        <!--
+        <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
+        -->
+
+        <!--<maven-site-plugin.version>4.0.0-M11</maven-site-plugin.version> -->
+        <maven-site-plugin.version>3.12.1</maven-site-plugin.version>
+        <doxia.version>1.11.1</doxia.version>
+
+        <!-- these are tied to the spring boot version -->
+        <spring-boot.version>3.4.1</spring-boot.version>
+
+        <jooq.version>3.19.17</jooq.version>
+        <flyway.version>11.1.1</flyway.version>
+
+        <jetbrains.version>24.1.0</jetbrains.version>
+
+        <commons-lang3.version>3.15.0</commons-lang3.version>
+
+        <!-- for testing -->
+        <hamcrest.version>2.2</hamcrest.version>
+        <testng.version>7.8.0</testng.version>
+
+        <!-- for auto-generation -->
+        <testcontainers.version>1.20.4</testcontainers.version>
+        <!--
+        <testcontainers-jooq-codegen-maven-plugin.version>0.0.3</testcontainers-jooq-codegen-maven-plugin.version>
+        -->
+
+        <postgresql-jdbc.version>42.6.0</postgresql-jdbc.version>  <!-- 42.7.4 -->
+        <postgresql-docker.version>13.8-alpine</postgresql-docker.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--
+            <dependency>
+                <groupId>com.coyotesong.examples.spring-boot</groupId>
+                <artifactId>release-profile</artifactId>
+                <version>0.9-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- this 'import' dependency allows us to inherit all -->
+            <!-- of the package dependencies in spring boot without -->
+            <!-- actually limiting us to using it as the parent pom -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <!-- for transactions -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-jdbc</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-jooq</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>annotations</artifactId>
+                <version>${jetbrains.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.15.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-database-postgresql</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql-jdbc.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <compilerId>javac</compilerId>
+                        <fork>true</fork>
+                        <meminitial>256m</meminitial>
+                        <maxmem>1024m</maxmem>
+                        <encoding>UTF-8</encoding>
+                        <compilerArgs>
+                            <arg>-J--add-opens=java.base/java.net=ALL-UNNAMED</arg>
+                            <arg>-XDcompilePolicy=simple</arg>
+                            <!-- disabling error-prone plugin for now as lots of syntactical changes needed -->
+                            <!--
+                            <arg>-Xplugin:ErrorProne
+                                 -Xep:AssertEqualsArgumentOrderChecker:ERROR
+                                 -Xep:DefaultCharset:ERROR
+                                 -Xep:EqualsIncompatibleType:ERROR
+                                 -Xep:ImmutableEnumChecker:ERROR
+                                 -Xep:MissingOverride:ERROR
+                                 -Xep:RemoveUnusedImports:ERROR
+                                 -Xep:StreamResourceLeak:ERROR
+                                 -Xep:ThreadLocalUsage:ERROR
+                                 -Xep:UnusedException:ERROR
+                                 -Xep:UnnecessaryParentheses:ERROR
+                                 -XepDisableWarningsInGeneratedCode
+                                 -XepExcludedPaths:.*/generated-sources/.*</arg>
+                            -->
+                            <arg>-Xlint:all</arg>
+                            <arg>-parameters</arg>
+                        </compilerArgs>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>com.google.errorprone</groupId>
+                                <artifactId>error_prone_core</artifactId>
+                                <version>${error-prone.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven-source-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>${maven-release-plugin.version}</version>
+                    <configuration>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>${maven-site-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <!-- Create 'war' file -->
+            <!--
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.1</version>
+            </plugin>
+            -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+
+            <!-- see quarkus example for more details... -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/ITest*</exclude>
+                        <exclude>**/TestContainer*</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- see quarkus example for more details... -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/ITest*</include>
+                        <include>**/TestContainer*</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <releaseProfiles>my-release-profile</releaseProfiles>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- TODO - this fails with message that DocumentContent class can't be found! -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-site-renderer</artifactId>
+                        <version>${doxia.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-module-markdown</artifactId>
+                        <version>${doxia.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <!--
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${jooq.target.directory}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>javadoc</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+
+                        <!-- javadoc can contain markdown instead of html. Still produces html. -->
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <!-- do not use 3.5.1: transitive dependencies of docletArtifact are not added to
+                                 docletpath, version 3.5.1 resolves this issue. https://issues.apache.org/jira/browse/MJAVADOC-742 -->
+                            <version>${maven-javadoc-plugin.version}</version>
+                            <executions>
+                                <execution>
+                                    <id>attach-sources</id>
+                                    <goals>
+                                        <goal>jar</goal>
+                                        <goal>test-jar</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>aggregate</id>
+                                    <goals>
+                                        <goal>aggregate</goal>
+                                    </goals>
+                                    <phase>site</phase>
+                                    <configuration>
+                                        <!-- Specific configuration for the aggregate report -->
+                                    </configuration>
+                                </execution>
+                                <execution>
+                                    <id>resource-bundles</id>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <!-- produce source artifact for main project sources -->
+                                        <goal>resource-bundle</goal>
+
+                                        <!-- produce source artifact for project test sources -->
+                                        <goal>test-resource-bundle</goal>
+                                    </goals>
+                                    <configuration>
+                                        <detectOfflineLinks>false</detectOfflineLinks>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <useStandardDocletOptions>true</useStandardDocletOptions>
+                                <doclet>org.jdrupes.mdoclet.MDoclet</doclet>
+                                <docletArtifacts>
+                                    <docletArtifact>
+                                        <groupId>org.jdrupes.mdoclet</groupId>
+                                        <artifactId>doclet</artifactId>
+                                        <version>4.2.0</version>
+                                    </docletArtifact>
+                                    <docletArtifact>
+                                        <groupId>com.vladsch.flexmark</groupId>
+                                        <artifactId>flexmark-all</artifactId>
+                                        <version>0.64.8</version>
+                                    </docletArtifact>
+                                </docletArtifacts>
+                                <!--  Note: additionalDependencies are added to the -classpath, not the docletpath -->
+                                <additionalDependencies>
+                                </additionalDependencies>
+                                <additionalJOptions>
+                                    <additionalJOption>-J--add-exports=jdk.javadoc/jdk.javadoc.internal.doclets.toolkit=ALL-UNNAMED</additionalJOption>
+                                    <additionalJOption>-J--add-exports=jdk.javadoc/jdk.javadoc.internal.tool=ALL-UNNAMED</additionalJOption>
+                                    <additionalJOption>-J--add-exports=jdk.compiler/com.sun.tools.doclint=ALL-UNNAMED</additionalJOption>
+                                    <additionalJOption>-J--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</additionalJOption>
+                                    <additionalJOption>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</additionalJOption>
+                                    <additionalJOption>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</additionalJOption>
+                                    <additionalJOption>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</additionalJOption>
+                                </additionalJOptions>
+                                <detectLinks>true</detectLinks>
+                                <links>
+                                    <link>https://docs.oracle.com/en/java/javase/18/docs/api/</link>
+                                    <link>https://docs.oracle.com/en/java/javase/18/docs/api/java.base/</link>
+                                    <!-- <link>https://www.jooq.org/javadoc/latest/help-doc.html</link> -->
+                                    <link>https://www.jooq.org/javadoc/latest/</link>
+                                    <link>https://docs.spring.io/spring-boot/api/java/</link>
+                                    <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
+                                    <!-- <link>https://docs.spring.io/spring-restdocs/docs/current/api/</link> -->
+                                    <link>https://javadoc.io/static/org.flywaydb/flyway-core/3.2/</link>
+                                    <link>https://googleapis.dev/java/google-api-services-youtube/latest/</link>
+                                    <link>https://javadoc.io/doc/com.google.http-client/google-http-client/latest/</link>
+                                    <link>https://javadoc.io/doc/org.testcontainers/testcontainers/latest/</link>
+                                    <link>https://javadoc.io/doc/com.zaxxer/HikariCP/latest/com.zaxxer.hikari/</link>
+                                    <link>https://logging.apache.org/log4j/2.x/javadoc/log4j-api/</link>
+                                    <link>https://logging.apache.org/log4j/2.x/javadoc/log4j-core/</link>
+                                </links>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
