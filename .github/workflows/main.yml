@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - 'main'
-  schedule:
-    - cron: '15 5 * * *'
+# schedule:
+#   - cron: '15 5 * * *'
 
 defaults:
   run:
@@ -16,7 +16,7 @@ jobs:
   build-and-push-docker-images:
     name: Build and push docker images for PostgreSQL + extensions
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
